@@ -21,7 +21,7 @@ révision : tu rédiges sur papier ─> photo ─> [transcription] ─> tu valid
   AnkiWeb). Pas besoin d'Anki desktop ni d'AnkiConnect — Sapio ouvre directement
   ta collection `.anki2`. C'est « juste un serveur web ».
 - **API** : Flask JSON (`sapio/api.py`).
-- **Front** : SPA React + Vite + TypeScript (`sapio/frontend/`), servie par Flask
+- **Front** : SPA React + Vite + TypeScript (`app/frontend/`), servie par Flask
   (même origine, pas de CORS).
 - **IA** : Anthropic (Claude) ou OpenRouter, un modèle par étape (extraction
   économique, notation de pointe).
@@ -46,8 +46,8 @@ python3 -m venv .venv && . .venv/bin/activate
 pip install -e .                  # + ".[prod]" pour gunicorn
 
 # Front :
-cd sapio/frontend
-npm install && npm run build      # produit sapio/frontend/dist/, servi par Flask
+cd app/frontend
+npm install && npm run build      # produit app/frontend/dist/, servi par Flask
 cd ../..
 ```
 
@@ -87,10 +87,10 @@ amorcées depuis l'environnement / `.env` (rétro-compat).
 sapio serve                       # http://localhost:5000 (et accessible sur le LAN)
 
 # Production :
-gunicorn sapio.wsgi:app --bind 127.0.0.1:5000
+gunicorn app.wsgi:app --bind 127.0.0.1:5000
 ```
 
-Pour le live-reload du front pendant le dev : `npm run dev` dans `sapio/frontend`.
+Pour le live-reload du front pendant le dev : `npm run dev` dans `app/frontend`.
 
 ### Flux de révision (3 temps — on ne note jamais une lecture non confirmée)
 

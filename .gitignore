@@ -8,8 +8,8 @@ __pycache__/
 .env
 
 # Frontend
-sapio/frontend/node_modules/
-sapio/frontend/dist/
+app/frontend/node_modules/
+app/frontend/dist/
 
 # Artefacts générés à l'exécution / au dev
 cards*.json

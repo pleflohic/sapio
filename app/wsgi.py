@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Point d'entrée WSGI pour la production (gunicorn).
 
-    gunicorn sapio.wsgi:app --bind 127.0.0.1:5000
+    gunicorn app.wsgi:app --bind 127.0.0.1:5000
 
 Les secrets sont lus dans l'environnement / `.env` ; les préférences
 (provider, modèles, DPI, collection) dans ~/.config/sapio/settings.json,

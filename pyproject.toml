@@ -16,11 +16,11 @@ dependencies = [
 prod = ["gunicorn>=21.0"]
 
 [project.scripts]
-sapio = "sapio.cli:main"
+sapio = "app.cli:main"
 
 [build-system]
 requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["sapio"]
+packages = ["app"]
