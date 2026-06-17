@@ -1,0 +1,19 @@
+# Python
+.venv/
+__pycache__/
+*.egg-info/
+*.pyc
+
+# Secrets (les préférences vont dans ~/.config/sapio/settings.json, hors repo)
+.env
+
+# Frontend
+sapio/frontend/node_modules/
+sapio/frontend/dist/
+
+# Artefacts générés à l'exécution / au dev
+cards*.json
+objects*.json
+decks*.json
+history.json
+bilan.pdf

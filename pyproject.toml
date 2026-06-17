@@ -1,0 +1,26 @@
+[project]
+name = "sapio"
+version = "0.0.1"
+description = "Révision active par IA branchée sur Anki : génère des cartes de restitution depuis un poly PDF, corrige tes copies manuscrites et planifie via FSRS."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "AGPL-3.0-or-later" }
+dependencies = [
+    "anki>=25.0",        # bibliothèque officielle Anki (collection, FSRS, sync AnkiWeb)
+    "anthropic>=0.40",
+    "openai>=1.40",      # provider OpenRouter (compatible OpenAI)
+    "flask>=3.0",
+]
+
+[project.optional-dependencies]
+prod = ["gunicorn>=21.0"]
+
+[project.scripts]
+sapio = "sapio.cli:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["sapio"]
