@@ -91,6 +91,7 @@ export interface DeckEntry {
   chapitre: string;
   lecon: string;
   deck: string;
+  level?: string;
 }
 export interface Taxonomy {
   annees: string[];
@@ -120,7 +121,7 @@ export async function importCards(
   annee: string,
   cours: string,
   decks: DeckEntry[]
-): Promise<{ added?: number; skipped?: number; decks?: string[]; error?: string }> {
+): Promise<{ added?: number; skipped?: number; seeded?: number; decks?: string[]; error?: string }> {
   const r = await fetch("/api/import", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

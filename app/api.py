@@ -38,6 +38,10 @@ DIST = Path(__file__).resolve().parent / "frontend" / "dist"
 # Surchargeable par SAPIO_BATCH_PAGES. Évite de dépasser le budget de sortie.
 _GEN_BATCH_PAGES = 10
 
+# Niveau de maîtrise initial par sous-deck → intervalle FSRS (jours). « neuf »
+# laisse la carte en état neuf (comportement par défaut, aucun amorçage).
+_MASTERY_DAYS = {"neuf": 0, "vu": 3, "correct": 10, "solide": 30, "acquis": 90}
+
 
 def _parse_pages(spec: str, total: int) -> tuple[int, int]:
     if not spec or spec == "all":
@@ -338,8 +342,28 @@ def create_api(config: dict) -> Flask:
         except anki.AnkiError as e:
             return jsonify({"error": str(e)}), 502
         added = sum(1 for r in res if r is not None)
+        # Préinitialisation du niveau de maîtrise, par sous-deck. On regroupe les
+        # notes créées par intervalle visé puis on sème la mémoire FSRS. Les
+        # doublons (res None) et le niveau « neuf » sont ignorés.
+        days_of_deck = {
+            f"{deck_root}::{e['deck']}": _MASTERY_DAYS.get((e.get("level") or "neuf").lower(), 0)
+            for e in decks
+        }
+        by_days: dict[int, list] = {}
+        for note, nid in zip(notes, res):
+            if nid is None:
+                continue
+            d = days_of_deck.get(note["deckName"], 0)
+            if d > 0:
+                by_days.setdefault(d, []).append(nid)
+        seeded = 0
+        for d, nids in by_days.items():
+            seeded += anki.seed_memory(anki.card_ids_of_notes(nids), d)
         synced = _autosync()
-        return jsonify({"added": added, "skipped": len(res) - added, "decks": deck_names, "synced": synced})
+        return jsonify({
+            "added": added, "skipped": len(res) - added, "seeded": seeded,
+            "decks": deck_names, "synced": synced,
+        })
 
     # ---- SPA statique (build Vite) ----
     @app.get("/")

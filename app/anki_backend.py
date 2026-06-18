@@ -168,6 +168,50 @@ def answer_card(card_id: int, ease: int) -> bool:
         return True
 
 
+def card_ids_of_notes(note_ids: list) -> list:
+    """Cartes engendrées par une liste de notes (une carte par note ici)."""
+    with _LOCK:
+        col = _col()
+        out: list = []
+        for nid in note_ids:
+            out.extend(col.get_note(nid).card_ids())
+        return out
+
+
+def seed_memory(card_ids: list, interval_days: int) -> int:
+    """Préinitialise un niveau de maîtrise sur des cartes neuves.
+
+    Les bascule en révision avec un intervalle ≈ `interval_days` (légère
+    dispersion pour éviter un pic de révisions le même jour) et sème la mémoire
+    FSRS : la stabilité est l'intervalle (à rétention 0.9, l'intervalle optimal
+    ≈ la stabilité) et la difficulté est médiane. `factor` sert de filet si FSRS
+    est désactivé (planification SM-2). Renvoie le nombre de cartes traitées.
+    """
+    if not card_ids or interval_days <= 0:
+        return 0
+    import random
+
+    from anki.cards_pb2 import FsrsMemoryState
+
+    with _LOCK:
+        col = _col()
+        today = col.sched.today
+        n = 0
+        for cid in card_ids:
+            ivl = max(1, round(interval_days * random.uniform(0.85, 1.15)))
+            card = col.get_card(cid)
+            card.type = 2  # CARD_TYPE_REV
+            card.queue = 2  # QUEUE_TYPE_REV
+            card.reps = max(card.reps, 1)
+            card.ivl = ivl
+            card.due = today + ivl
+            card.factor = 2500
+            card.memory_state = FsrsMemoryState(stability=float(ivl), difficulty=5.0)
+            col.update_card(card)
+            n += 1
+        return n
+
+
 # --- Note type --------------------------------------------------------------
 def ensure_model() -> None:
     with _LOCK:

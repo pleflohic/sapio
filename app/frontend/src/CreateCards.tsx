@@ -2,6 +2,16 @@
 import { useState } from "react";
 import { generate, importCards, DeckEntry, GenResult } from "./api";
 
+// Niveaux de maîtrise initiaux (du neuf à l'acquis). « Neuf » = aucun amorçage,
+// la carte reste neuve. Les autres préinitialisent la mémoire FSRS côté serveur.
+const LEVELS: { value: string; label: string }[] = [
+  { value: "neuf", label: "Neuf" },
+  { value: "vu", label: "Vu" },
+  { value: "correct", label: "Correct" },
+  { value: "solide", label: "Solide" },
+  { value: "acquis", label: "Acquis" },
+];
+
 export function CreateCards({ onDone }: { onDone: () => void }) {
   const [file, setFile] = useState<File | null>(null);
   const [pages, setPages] = useState("");
@@ -10,7 +20,7 @@ export function CreateCards({ onDone }: { onDone: () => void }) {
   const [decks, setDecks] = useState<DeckEntry[]>([]);
   const [annee, setAnnee] = useState("");
   const [cours, setCours] = useState("");
-  const [done, setDone] = useState<{ added?: number; skipped?: number }>({});
+  const [done, setDone] = useState<{ added?: number; skipped?: number; seeded?: number }>({});
   const [err, setErr] = useState("");
 
   async function runGenerate() {
@@ -41,7 +51,7 @@ export function CreateCards({ onDone }: { onDone: () => void }) {
       setErr(d.error);
       return;
     }
-    setDone({ added: d.added, skipped: d.skipped });
+    setDone({ added: d.added, skipped: d.skipped, seeded: d.seeded });
     setPhase("done");
   }
 
@@ -61,7 +71,8 @@ export function CreateCards({ onDone }: { onDone: () => void }) {
         <h2>Cartes créées ✓</h2>
         <p className="lead">
           {done.added} carte(s) ajoutée(s) à Anki
-          {done.skipped ? `, ${done.skipped} ignorée(s) (doublons)` : ""}.
+          {done.skipped ? `, ${done.skipped} ignorée(s) (doublons)` : ""}
+          {done.seeded ? `, dont ${done.seeded} préinitialisée(s) à un niveau de maîtrise` : ""}.
         </p>
         <p>
           <button className="ghost" onClick={() => setPhase("form")}>
@@ -95,7 +106,10 @@ export function CreateCards({ onDone }: { onDone: () => void }) {
         )}
         <p className="lead">
           Vérifie le découpage en sous-decks. Renomme un <code>deck</code>, ou donne le
-          <b> même</b> chemin à plusieurs parties pour les fusionner.
+          <b> même</b> chemin à plusieurs parties pour les fusionner. Le <b>niveau</b>{" "}
+          préinitialise ta maîtrise : laisse <b>Neuf</b> pour repartir de zéro, ou monte
+          le curseur (Vu, Correct, Solide, Acquis) pour les parties que tu connais déjà,
+          FSRS espacera d'autant les premières révisions.
         </p>
         <div className="card">
           <div className="meta" style={{ marginBottom: ".5rem" }}>
@@ -130,16 +144,34 @@ export function CreateCards({ onDone }: { onDone: () => void }) {
             <div className="meta">
               {d.chapitre} › {d.lecon}
             </div>
-            <input
-              type="text"
-              value={d.deck}
-              onChange={(e) => {
-                const next = decks.slice();
-                next[i] = { ...d, deck: e.target.value };
-                setDecks(next);
-              }}
-              style={{ width: "100%", marginTop: ".4rem", padding: ".5rem .6rem", borderRadius: 8, border: "1px solid var(--line-strong)", fontFamily: "ui-monospace, monospace", fontSize: ".9rem" }}
-            />
+            <div style={{ display: "flex", gap: ".5rem", marginTop: ".4rem" }}>
+              <input
+                type="text"
+                value={d.deck}
+                onChange={(e) => {
+                  const next = decks.slice();
+                  next[i] = { ...d, deck: e.target.value };
+                  setDecks(next);
+                }}
+                style={{ flex: 1, padding: ".5rem .6rem", borderRadius: 8, border: "1px solid var(--line-strong)", fontFamily: "ui-monospace, monospace", fontSize: ".9rem" }}
+              />
+              <select
+                value={d.level || "neuf"}
+                onChange={(e) => {
+                  const next = decks.slice();
+                  next[i] = { ...d, level: e.target.value };
+                  setDecks(next);
+                }}
+                title="Niveau de maîtrise initial"
+                style={{ padding: ".5rem .6rem", borderRadius: 8, border: "1px solid var(--line-strong)", background: "var(--bg)", color: "inherit" }}
+              >
+                {LEVELS.map((l) => (
+                  <option key={l.value} value={l.value}>
+                    {l.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         ))}
         {err && <p style={{ color: "var(--theo)" }}>{err}</p>}
