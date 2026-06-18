@@ -301,6 +301,13 @@ def sync(direction: str | None = None) -> str:
         endpoint = os.environ.get("ANKIWEB_ENDPOINT") or None
         auth = col.sync_login(user, pw, endpoint)
         if direction in ("upload", "download"):
+            # AnkiWeb redirige vers un serveur de sync précis (sync13, etc.).
+            # Après login l'endpoint est vide : on le négocie via un sync normal
+            # (qui se contente de constater qu'un full sync est requis), puis on
+            # rejoue le full sur ce serveur, sinon AnkiWeb renvoie un 400.
+            out = col.sync_collection(auth, sync_media=False)
+            if out.new_endpoint:
+                auth.endpoint = out.new_endpoint
             col.full_upload_or_download(auth=auth, server_usn=None, upload=(direction == "upload"))
             return "full-" + direction
         out = col.sync_collection(auth, sync_media=False)
