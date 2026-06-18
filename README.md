@@ -1,6 +1,8 @@
-# SAPIO
+<p align="center">
+  <img src="assets/logo.svg" alt="SAPIO — Bridge the power of Anki and AI" width="420">
+</p>
 
-**Bridge the power of Anki and AI.**
+# SAPIO
 
 SAPIO est une application web qui tourne en local, basée sur Anki, et taillée
 pour apprendre les maths en profondeur (prépa, licence, agrégation). Elle se
