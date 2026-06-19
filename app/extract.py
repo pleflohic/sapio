@@ -25,22 +25,25 @@ Tu es un agrégatif de mathématiques qui dépouille un polycopié de cours pour
 extraire la structure, en vue de préparer l'oral d'agrégation.
 
 On te donne les images des pages d'un poly. Extrais-en les OBJETS DE COURS : \
-définitions, théorèmes, propositions, lemmes, EXERCICES, et tout RÉSULTAT/CAS/FAIT \
-important à connaître. Pour chacun :
+définitions, théorèmes, propositions, lemmes et EXERCICES. Capte aussi les résultats \
+et faits importants énoncés de façon informelle, mais traite-les en exercices (voir \
+RÈGLES). Pour chacun :
 
 - type : "definition", "theoreme", "proposition", "lemme" ou "exercice". Distingue :
     * "theoreme" : un résultat MAJEUR (le plus central) ;
-    * "proposition" : un résultat important mais moins central qu'un théorème. \
-      Utilise aussi "proposition" pour les RÉSULTATS / CAS / FAITS importants à \
-      connaître même s'ils ne sont PAS encadrés comme tels (ex. : « si $X$ est \
-      $\\mathscr G$-mesurable alors $\\mathbb E[X|\\mathscr G]=X$ », cas particuliers, \
-      remarques-clés) ;
+    * "proposition" : un résultat important mais moins central qu'un théorème, que le \
+      poly présente FORMELLEMENT comme tel (encadré, numéroté, ou nommé « Proposition »). \
+      Ne promeus PAS en proposition un fait énoncé en passant, un cas particulier ou une \
+      remarque : ceux-là deviennent des exercices (voir RÈGLES) ;
     * "lemme" : un résultat technique, étape intermédiaire ;
     * "exercice" : un exercice que l'élève doit savoir résoudre, OU un exemple / \
-      contre-exemple présent dans le poly assez riche pour être justifié (voir RÈGLES).
+      contre-exemple, OU un résultat informel du poly assez riche pour être justifié \
+      (voir RÈGLES).
   Respecte l'étiquette du poly quand elle existe (« Théorème », « Proposition »…).
-- titre : le nom usuel (« Théorème de Baire », « Définition d'une martingale »…). \
-À défaut, un titre court et descriptif.
+- titre : un nom ou un libellé COURT qui sert d'étiquette (« Théorème de Baire », \
+« Cas indépendant », « Définition d'une martingale »). JAMAIS l'énoncé complet ni une \
+formule : l'énoncé entier va dans `enonce`, pas dans `titre`, sinon la carte « énoncer » \
+donnerait sa propre réponse.
 - chapitre : le CHAPITRE du poly où il apparaît, avec son numéro si visible \
 (ex. « 1. Définition dans le cas positif »).
 - lecon : la PARTIE/SECTION précise au sein du chapitre, avec son numéro si visible \
@@ -69,6 +72,12 @@ RÈGLES :
   (« Montrer que ... est une tribu », « Montrer que ... n'est pas mesurable »), `preuve` \
   = la justification (celle du poly, sinon rédige-la). S'il est trivial ou purement \
   illustratif, ignore-le.
+- RÉSULTATS INFORMELS (faits, cas particuliers, conséquences utiles énoncés en passant, \
+  NON encadrés comme théorème/proposition) : ne les émets pas comme proposition. S'il y \
+  a quelque chose à ÉTABLIR, traite-les en "exercice" : `enonce` = la tâche (« Montrer \
+  que si $X$ est indépendante de $\\mathscr G$ alors $\\mathbb E[X|\\mathscr G]=\\mathbb \
+  E[X]$ »), `preuve` = la justification. Réserve théorème/proposition/lemme/définition \
+  aux énoncés que le poly présente formellement comme tels.
 - Les champs non pertinents sont des chaînes vides "", jamais omis.
 - Le contenu mathématique est en LaTeX.
 - Ignore les pages de garde, tables des matières, et le texte de liaison sans contenu.
