@@ -219,9 +219,11 @@ mjx-container { max-width: 100%; }
   .tagline { display: none; }
   .tabs {
     order: 3; width: 100%; margin-left: 0; gap: 0.3rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
-  .tab { white-space: nowrap; padding: 0.4rem 0.7rem; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { white-space: nowrap; flex: none; padding: 0.4rem 0.8rem; }
   .wrap { padding: 1.1rem 0.9rem 6.5rem; }
   .card { padding: 0.9rem 0.95rem; }
   h1 { font-size: 1.35rem; }
