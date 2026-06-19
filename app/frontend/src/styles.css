@@ -206,3 +206,31 @@ a { color: var(--prop); }
 .secret-ok { color: #2e7d44; font-weight: 700; }
 .secret-no { color: var(--exo); font-weight: 700; }
 .secret-hint { margin-left: auto; font-family: ui-monospace, monospace; font-size: 0.78rem; }
+
+/* Une formule large scrolle à l'intérieur de son bloc au lieu de pousser la page. */
+mjx-container { max-width: 100%; }
+.consigne, .ctx, .preview, .feedback, .justif { overflow-x: auto; }
+.card-top { flex-wrap: wrap; }
+
+/* Mobile : la barre du haut passe sur deux lignes (logo + sync, puis onglets
+   défilables), les champs font >= 16px pour éviter le zoom auto d'iOS au focus. */
+@media (max-width: 760px) {
+  .appbar-inner { flex-wrap: wrap; padding: 0.5rem 0.85rem; gap: 0.45rem; }
+  .tagline { display: none; }
+  .tabs {
+    order: 3; width: 100%; margin-left: 0; gap: 0.3rem;
+    flex-wrap: wrap;
+  }
+  .tab { white-space: nowrap; padding: 0.4rem 0.7rem; }
+  .wrap { padding: 1.1rem 0.9rem 6.5rem; }
+  .card { padding: 0.9rem 0.95rem; }
+  h1 { font-size: 1.35rem; }
+  h2 { font-size: 1.12rem; }
+  .consigne { font-size: 1rem; }
+  textarea, .field input, .field select, input[type="file"] { font-size: 16px; }
+  .nav { padding: 0.6rem 0.85rem; }
+  .nav button, .nav .btn { padding: 0.7rem 1rem; font-size: 0.94rem; }
+  .secret-row { flex-wrap: wrap; }
+  .secret-name { min-width: 0; }
+  .secret-hint { margin-left: 0; width: 100%; }
+}
