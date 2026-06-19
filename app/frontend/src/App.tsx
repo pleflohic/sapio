@@ -236,8 +236,16 @@ function ReviewFlow(props: any) {
 function Prep({ phases, busy, onPhotos }: { phases: Phase[]; busy: boolean; onPhotos: (f: File[]) => void }) {
   const [i, setI] = useState(0);
   const [files, setFiles] = useState<File[]>([]);
+  const [urls, setUrls] = useState<string[]>([]);
   const steps = phases.length + 1;
   const onCapture = i === phases.length;
+
+  // Aperçus : un object URL par photo, révoqués quand la liste change.
+  useEffect(() => {
+    const u = files.map((f) => URL.createObjectURL(f));
+    setUrls(u);
+    return () => u.forEach((x) => URL.revokeObjectURL(x));
+  }, [files]);
 
   return (
     <div>
@@ -270,17 +278,39 @@ function Prep({ phases, busy, onPhotos }: { phases: Phase[]; busy: boolean; onPh
       ) : (
         <>
           <h2>Photo de ta copie</h2>
-          <p className="lead">Tout rédigé ? Photographie l'ensemble (une ou plusieurs photos).</p>
+          <p className="lead">
+            Tout rédigé ? Ajoute une ou plusieurs photos de l'ensemble, depuis l'appareil
+            ou la galerie. Tu peux en ajouter autant que nécessaire.
+          </p>
           <div className="drop">
             <input
               type="file"
               accept="image/*"
-              capture="environment"
               multiple
-              onChange={(e) => setFiles(Array.from(e.target.files || []))}
+              onChange={(e) => {
+                const picked = Array.from(e.target.files || []);
+                if (picked.length) setFiles((prev) => [...prev, ...picked]);
+                e.target.value = ""; // permet de réajouter / reprendre une photo
+              }}
             />
-            {files.length > 0 && <p className="muted">{files.length} photo(s) sélectionnée(s)</p>}
+            <p className="muted">Appareil photo ou galerie.</p>
           </div>
+          {files.length > 0 && (
+            <div className="photos">
+              {files.map((f, k) => (
+                <div key={k} className="photo-item">
+                  <img src={urls[k]} alt={`photo ${k + 1}`} />
+                  <button
+                    type="button"
+                    aria-label="retirer"
+                    onClick={() => setFiles(files.filter((_, j) => j !== k))}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </>
       )}
       <Bar>
