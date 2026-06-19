@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { generate, importCards, DeckEntry, GenResult } from "./api";
 
 // Niveaux de maîtrise initiaux (du neuf à l'acquis). « Neuf » = aucun amorçage,
@@ -22,7 +22,17 @@ export function CreateCards({ onDone }: { onDone: () => void }) {
   const [cours, setCours] = useState("");
   const [done, setDone] = useState<{ added?: number; skipped?: number; seeded?: number }>({});
   const [prog, setProg] = useState<{ done: number; total: number } | null>(null);
+  const [elapsed, setElapsed] = useState(0);
   const [err, setErr] = useState("");
+
+  // Compteur de temps écoulé pendant la lecture : un lot peut durer une à deux
+  // minutes (un appel au LLM), et sans ça l'écran semble figé.
+  useEffect(() => {
+    if (phase !== "loading") return;
+    setElapsed(0);
+    const t = setInterval(() => setElapsed((e) => e + 1), 1000);
+    return () => clearInterval(t);
+  }, [phase]);
 
   async function runGenerate() {
     if (!file) return;
@@ -67,11 +77,11 @@ export function CreateCards({ onDone }: { onDone: () => void }) {
           Le modèle lit les pages et en extrait la structure. Ça peut prendre
           quelques minutes sur un gros poly.
         </p>
-        {prog && prog.total > 0 && (
-          <p className="lead">
-            Lot {Math.min(prog.done + 1, prog.total)} / {prog.total}
-          </p>
-        )}
+        <p className="lead">
+          {prog && prog.total > 0 ? `Lot ${Math.min(prog.done + 1, prog.total)} / ${prog.total} · ` : ""}
+          {Math.floor(elapsed / 60)}min {String(elapsed % 60).padStart(2, "0")}s
+        </p>
+        <p className="muted">Tu peux laisser l'onglet ouvert, ça continue côté serveur.</p>
       </div>
     );
 
