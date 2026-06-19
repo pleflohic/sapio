@@ -9,6 +9,7 @@ mono-utilisateur dans un global, comme l'app web historique.
 
 from __future__ import annotations
 
+import json
 import os
 import tempfile
 import threading
@@ -99,6 +100,28 @@ def _public_card(c: dict) -> dict:
     }
 
 
+def _gen_cache_path() -> Path:
+    """Fichier où l'on persiste la dernière génération, pour que l'import survive
+    à un redémarrage du serveur (l'état mémoire, lui, est volatil)."""
+    return settings._config_dir() / "last_gen.json"
+
+
+def _save_gen(gen: dict) -> None:
+    try:
+        p = _gen_cache_path()
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(json.dumps(gen), encoding="utf-8")
+    except OSError:
+        pass
+
+
+def _load_gen() -> dict | None:
+    try:
+        return json.loads(_gen_cache_path().read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+
+
 def _run_generation(job_id: str, tmp_path: str, spec: str, s: dict, batch: int, dpi: int) -> None:
     """Lit le poly lot par lot en arrière-plan et publie le résultat dans _JOBS.
 
@@ -131,6 +154,7 @@ def _run_generation(job_id: str, tmp_path: str, spec: str, s: dict, batch: int, 
         cards = cards_mod.expand_all(objs)
         decks = cards_mod.default_deck_map(cards)
         STATE["gen"] = {"cards": [c.model_dump() for c in cards], "decks": decks}
+        _save_gen(STATE["gen"])  # persiste pour survivre à un redémarrage
         suggestion = {"annee": "", "cours": ""}
         try:
             sug = extract.suggest_taxonomy(s["provider"], s["extract_model"], objs)
@@ -396,9 +420,10 @@ def create_api(config: dict) -> Flask:
 
     @app.post("/api/import")
     def api_import():
-        gen = STATE.get("gen")
+        gen = STATE.get("gen") or _load_gen()
         if not gen:
             return jsonify({"error": "rien à importer (génère d'abord)"}), 400
+        STATE["gen"] = gen  # repeuple le cache mémoire après un redémarrage
         body = request.get_json(silent=True) or {}
         decks = body.get("decks", gen["decks"])
         annee = (body.get("annee") or "").strip()
