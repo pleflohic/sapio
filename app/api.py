@@ -331,19 +331,27 @@ def create_api(config: dict) -> Flask:
             for i in items if i.get("traitee") and i["numero"] in cards
         ]
         gmap = {}
+        prev_easy: set = set()
         if confirmed:
             s = settings.get()
             batch = review.grade_batch(s["provider"], s["review_model"], confirmed)
             gmap = {g.numero: g for g in batch.grades}
+            last = anki.last_ratings([c["card_id"] for c in confirmed])
+            prev_easy = {cid for cid, ease in last.items() if ease == 4}
         treated = {c["numero"] for c in confirmed}
         results = []
         for num, c in cards.items():
             g = gmap.get(num)
+            note = g.note if g else ""
+            # Carte de nouveau réussie (good) et déjà notée easy au passage
+            # précédent → easy par défaut (on reprend le jugement de l'utilisateur).
+            if note == "good" and int(c["card_id"]) in prev_easy:
+                note = "easy"
             results.append({
                 "numero": num, "card_id": c["card_id"], "titre": c["titre"],
                 "type": c["type"], "color": _TYPE_COLOR.get(c["type"], ""), "mode": c["mode"],
                 "graded": num in treated and g is not None,
-                "feedback": g.feedback if g else "", "note": g.note if g else "",
+                "feedback": g.feedback if g else "", "note": note,
                 "justification": g.justification if g else "",
             })
         STATE["results"] = results

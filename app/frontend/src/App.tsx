@@ -348,6 +348,10 @@ function Results({ results, busy, onCommit }: { results: Result[]; busy: boolean
     <div>
       <h2>Résultats</h2>
       <p className="lead">Le feedback et la note proposée par carte. Ajuste la note si besoin.</p>
+      <p className="muted" style={{ marginTop: "-0.7rem", marginBottom: "1.1rem", fontSize: "0.88rem" }}>
+        L'IA évalue la justesse de ta réponse, pas l'effort qu'elle t'a coûté. Si une carte
+        t'a demandé peu ou pas d'effort, passe-la en « easy » toi-même.
+      </p>
       {results.map((r) => {
         const sel = notes[r.numero] || r.note;
         return (

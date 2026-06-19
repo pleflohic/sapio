@@ -151,6 +151,23 @@ def deck_total_counts() -> dict:
         return out
 
 
+def last_ratings(card_ids: list) -> dict:
+    """{card_id: ease de la dernière révision (1..4)} d'après le journal Anki.
+
+    Sert à reproposer « easy » par défaut sur une carte que l'utilisateur avait
+    lui-même notée easy au passage précédent. Les cartes jamais révisées (ou
+    seulement amorcées) sont absentes du résultat.
+    """
+    with _LOCK:
+        col = _col()
+        out: dict = {}
+        for cid in card_ids:
+            row = col.db.first("select ease from revlog where cid = ? order by id desc limit 1", cid)
+            if row and row[0]:
+                out[int(cid)] = int(row[0])
+        return out
+
+
 def decks_of(card_ids: list) -> set:
     """Ensemble des noms de decks contenant les cartes données."""
     with _LOCK:
