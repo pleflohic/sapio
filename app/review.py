@@ -28,12 +28,9 @@ RATING_TO_EASE = {"again": 1, "hard": 2, "good": 3, "easy": 4}
 _RUBRIQUES = {
     "enoncer": "Fidélité EXACTE à l'énoncé attendu : toutes les hypothèses, tous les "
     "quantificateurs, rien en trop. Une hypothèse oubliée ou un quantificateur faux est grave.",
-    "reformuler": "Compréhension avec SES PROPRES MOTS. Pénalise le par-cœur récité mot pour "
-    "mot : l'exercice est de reformuler. Vérifie surtout que le sens profond est juste et complet.",
-    "preuve": "Rigueur COMPLÈTE : chaque étape justifiée, toutes les hypothèses utilisées, aucun "
-    "cercle logique, aucune étape bâclée. Une étape clé manquante ou fausse → Again.",
-    "idees_cles": "L'élève doit dégager le SQUELETTE stratégique de la preuve (les idées "
-    "motrices), pas la rédiger en détail. Sait-il dire POURQUOI la preuve marche ?",
+    "preuve": "L'élève doit dégager l'idée directrice PUIS rédiger la preuve avec une rigueur "
+    "COMPLÈTE : chaque étape justifiée, toutes les hypothèses utilisées, aucun cercle logique, "
+    "aucune étape bâclée. Une étape clé manquante ou fausse → Again.",
     "exemple": "L'objet proposé satisfait-il réellement la propriété demandée, et est-il bien "
     "justifié ? Plusieurs réponses correctes sont possibles : juge la validité, pas la conformité.",
     "contre_exemple": "L'objet proposé est-il un contre-exemple VALIDE (il met bien en défaut la "

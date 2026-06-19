@@ -17,31 +17,30 @@ from .models import Card, CourseObject, Importance, ObjectType
 # Facettes candidates par (catégorie d'objet, importance). L'ordre est l'ordre
 # de génération. Une facette n'est gardée que si le champ source est non vide.
 _THEOREME_FACETTES = {
-    Importance.central: ["enoncer", "reformuler", "preuve", "idees_cles"],
-    Importance.standard: ["enoncer", "preuve", "idees_cles"],
+    Importance.central: ["enoncer", "preuve"],
+    Importance.standard: ["enoncer", "preuve"],
     Importance.technique: ["enoncer", "preuve"],
 }
 _DEFINITION_FACETTES = {
-    Importance.central: ["enoncer", "reformuler", "exemple", "contre_exemple"],
+    Importance.central: ["enoncer", "exemple", "contre_exemple"],
     Importance.standard: ["enoncer", "exemple"],
     Importance.technique: ["enoncer"],
 }
 _EXERCICE_FACETTES = {
-    Importance.central: ["resoudre", "idees_cles"],
+    Importance.central: ["resoudre"],
     Importance.standard: ["resoudre"],
     Importance.technique: ["resoudre"],
 }
 
 # Modes qui OPÈRENT sur l'énoncé → on affiche l'énoncé comme contexte.
 # (Pas `enoncer` : l'énoncé y est la réponse. Pas `resoudre` : déjà dans la consigne.)
-_CONTEXT_MODES = {"reformuler", "preuve", "idees_cles", "exemple", "contre_exemple"}
+_CONTEXT_MODES = {"preuve", "exemple", "contre_exemple"}
 
-# Champ de l'objet servant d'`attendu` pour chaque mode.
+# Champ de l'objet servant d'`attendu` pour chaque mode. La carte `preuve`
+# fusionne idée directrice et preuve complète : sa référence reste la preuve.
 _ATTENDU_FIELD = {
     "enoncer": "enonce",
-    "reformuler": "enonce",
     "preuve": "preuve",
-    "idees_cles": "idees_cles",
     "exemple": "exemple",
     "contre_exemple": "contre_exemple",
     "resoudre": "preuve",  # le corrigé de l'exercice
@@ -52,9 +51,7 @@ def _consigne(mode: str, obj: CourseObject) -> str:
     t = obj.titre
     return {
         "enoncer": f"Énonce précisément : {t}.",
-        "reformuler": f"Reformule avec tes propres mots, sans réciter : {t}. Qu'est-ce que ça dit, moralement ?",
-        "preuve": f"Démontre : {t}.",
-        "idees_cles": f"Quelles sont les idées clés de la preuve / résolution de : {t} ?",
+        "preuve": f"Dégage d'abord l'idée directrice, puis rédige la preuve complète : {t}.",
         "exemple": f"Donne et justifie un exemple canonique pour : {t}.",
         "contre_exemple": f"Donne et justifie un contre-exemple éclairant pour : {t}.",
         "resoudre": f"Résous l'exercice : {t}.\n{obj.enonce}",
