@@ -253,6 +253,60 @@ def ensure_model() -> None:
         col.models.save(m)
 
 
+# --- Preset de deck (étapes d'apprentissage adaptées FSRS) ------------------
+_SAPIO_PRESET = "SAPIO"
+
+
+def _ensure_sapio_preset(col) -> int:
+    """Garantit un preset de deck « SAPIO » sans étapes d'apprentissage.
+
+    Sans paliers (new/lapse delays vides), un « bon » fait passer la carte
+    directement à son intervalle FSRS au lieu de la faire repasser dans la
+    session. C'est adapté au modèle de SAPIO (une copie écrite et photographiée
+    en une fois, pas de reprise quelques minutes après). Renvoie l'id du preset.
+    """
+    conf = next((c for c in col.decks.all_config() if c["name"] == _SAPIO_PRESET), None)
+    if conf is None:
+        cid = col.decks.add_config_returning_id(_SAPIO_PRESET)
+        conf = col.decks.get_config(cid)
+    changed = False
+    if conf["new"].get("delays") != []:
+        conf["new"]["delays"] = []
+        changed = True
+    if conf["lapse"].get("delays") != []:
+        conf["lapse"]["delays"] = []
+        changed = True
+    if changed:
+        col.decks.update_config(conf)
+    return conf["id"]
+
+
+def _apply_preset_locked(col) -> int:
+    """Assigne le preset SAPIO à tous les decks contenant des cartes Sapio.
+
+    Idempotent : un deck déjà sur le preset n'est pas réécrit (pas de churn de
+    synchro). Renvoie le nombre de decks effectivement réassignés.
+    """
+    cid = _ensure_sapio_preset(col)
+    names = {col.decks.name(col.get_card(c).did) for c in col.find_cards('note:"Sapio Restitution"')}
+    n = 0
+    for name in names:
+        did = col.decks.id(name, create=False)
+        if not did:
+            continue
+        deck = col.decks.get(did)
+        if deck.get("conf") != cid:
+            deck["conf"] = cid
+            col.decks.save(deck)
+            n += 1
+    return n
+
+
+def apply_deck_preset() -> int:
+    with _LOCK:
+        return _apply_preset_locked(_col())
+
+
 # --- Écriture ---------------------------------------------------------------
 def add_notes(notes: list) -> list:
     """Ajoute des notes (forme produite par card_to_note) ; renvoie les ids (ou None)."""
@@ -272,6 +326,7 @@ def add_notes(notes: list) -> list:
                 res.append(note.id)
             except Exception:
                 res.append(None)
+        _apply_preset_locked(col)  # SAPIO impose ses étapes d'apprentissage
         return res
 
 

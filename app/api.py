@@ -381,9 +381,14 @@ def create_api(config: dict) -> Flask:
     def api_sync():
         direction = (request.get_json(silent=True) or {}).get("direction")
         try:
-            return jsonify({"status": anki.sync(direction)})
+            status = anki.sync(direction)
         except anki.AnkiError as e:
             return jsonify({"error": str(e)})
+        try:
+            anki.apply_deck_preset()  # réimpose les étapes d'apprentissage SAPIO
+        except Exception:
+            pass
+        return jsonify({"status": status})
 
     def _autosync() -> bool:
         try:

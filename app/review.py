@@ -24,6 +24,12 @@ from .models import BatchGrade, BatchTranscription, Evaluation
 # Note → ease AnkiConnect (answerCards attend 1..4).
 RATING_TO_EASE = {"again": 1, "hard": 2, "good": 3, "easy": 4}
 
+
+def _cap_easy(note: str) -> str:
+    """Claude juge la justesse, pas l'effort. « easy » (sans effort) relève de
+    l'élève seul, donc on plafonne toute note proposée à « good »."""
+    return "good" if note == "easy" else note
+
 # Grille d'évaluation par mode (spec §4 / §7).
 _RUBRIQUES = {
     "enoncer": "Fidélité EXACTE à l'énoncé attendu : toutes les hypothèses, tous les "
@@ -56,8 +62,10 @@ On te donne une CONSIGNE, le MODE d'évaluation, la RÉPONSE ATTENDUE (référen
 issue du cours), et une PHOTO de la copie manuscrite de l'élève.
 
 Lis la copie, compare-la à l'attendu selon la grille du mode, rends un feedback ciblé, \
-et choisis le bouton : again (faux / hypothèse ou étape clé manquante) · hard (correct \
-mais lacunaire) · good (complet et rigoureux) · easy (impeccable).
+et choisis le bouton parmi : again (faux / hypothèse ou étape clé manquante) · hard \
+(correct mais lacunaire) · good (juste et complet). Ne propose JAMAIS « easy » : juger \
+qu'une carte fut sans effort relève de l'élève seul, pas de la copie. La meilleure note \
+que tu puisses attribuer est « good ».
 
 RÈGLE FERME : si un passage décisif est illisible/ambigu, ne tranche pas à l'aveugle — \
 mets-le dans "doutes" (question précise) et donne une note provisoire prudente. Indique \
@@ -68,7 +76,7 @@ JSON_SHAPE = """\
 FORMAT DE SORTIE : réponds UNIQUEMENT par un objet JSON valide :
 {"lecture": "...", "confiance": "haute|moyenne|faible", \
 "doutes": [{"passage": "...", "question": "..."}], "feedback": "...", \
-"note": "again|hard|good|easy", "justification": "..."}\
+"note": "again|hard|good", "justification": "..."}\
 """
 
 
@@ -102,7 +110,9 @@ def evaluate(provider, model, card, image, clarifications=None) -> Evaluation:
             system=SYSTEM, messages=[{"role": "user", "content": content}],
             output_format=Evaluation,
         )
-        return resp.parsed_output
+        ev = resp.parsed_output
+        ev.note = _cap_easy(ev.note)
+        return ev
     if provider == "openrouter":
         from openai import OpenAI
 
@@ -156,14 +166,15 @@ TRANSCRIPTION (en LaTeX, validée par l'élève) de ce qu'il a écrit. Il n'y a 
 tu juges le texte transcrit, considéré comme fidèle.
 
 Pour chaque carte, évalue selon la grille du mode, rédige un feedback ciblé (hypothèse \
-oubliée, étape bâclée, cercle logique, exemple mal choisi…) et choisis la note : \
+oubliée, étape bâclée, cercle logique, exemple mal choisi…) et choisis la note parmi : \
 again (faux / étape ou hypothèse clé manquante) · hard (correct mais lacunaire) · \
-good (complet et rigoureux) · easy (impeccable).\
+good (juste et complet). Ne propose JAMAIS « easy » : juger qu'une carte fut sans effort \
+relève de l'élève seul, pas de la transcription. La meilleure note possible est « good ».\
 """
 
 JSON_SHAPE_GRADE = """\
 FORMAT DE SORTIE : objet JSON valide uniquement :
-{"grades": [{"numero": 1, "feedback": "...", "note": "again|hard|good|easy", \
+{"grades": [{"numero": 1, "feedback": "...", "note": "again|hard|good", \
 "justification": "..."}]}\
 """
 
@@ -215,9 +226,12 @@ def grade_batch(provider, model, cards) -> BatchGrade:
         from .extract import anthropic_parsed_stream
 
         # Notation = jugement de rigueur → effort élevé.
-        return anthropic_parsed_stream(
+        batch = anthropic_parsed_stream(
             model, SYSTEM_GRADE, prompt, BatchGrade, max_tokens=32000, effort="high"
         )
+        for g in batch.grades:
+            g.note = _cap_easy(g.note)
+        return batch
     if provider == "openrouter":
         from openai import OpenAI
 
@@ -247,7 +261,7 @@ def _loads(text: str) -> dict:
 def _parse_one(text: str, _model, single=True) -> Evaluation:
     data = _loads(text)
     note = str(data.get("note", "")).strip().lower()
-    data["note"] = note if note in RATING_TO_EASE else "again"
+    data["note"] = _cap_easy(note if note in RATING_TO_EASE else "again")
     data.setdefault("doutes", [])
     for f in ("lecture", "confiance", "feedback", "justification"):
         data.setdefault(f, "")
@@ -268,7 +282,7 @@ def _parse_grade(text: str) -> BatchGrade:
     data = _loads(text)
     for g in data.get("grades", []):
         note = str(g.get("note", "")).strip().lower()
-        g["note"] = note if note in RATING_TO_EASE else "again"
+        g["note"] = _cap_easy(note if note in RATING_TO_EASE else "again")
         for f in ("feedback", "justification"):
             g.setdefault(f, "")
     return BatchGrade.model_validate(data)
