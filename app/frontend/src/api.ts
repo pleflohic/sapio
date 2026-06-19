@@ -109,12 +109,34 @@ export interface GenResult {
   error?: string;
 }
 
-export async function generate(file: File, pages: string): Promise<GenResult> {
+// La génération tourne en arrière-plan côté serveur (un poly entier dépasse le
+// timeout d'un reverse-proxy). On démarre le job puis on interroge l'avancement
+// toutes les 2 s jusqu'à la fin. `onProgress` alimente la barre de progression.
+export async function generate(
+  file: File,
+  pages: string,
+  onProgress?: (done: number, total: number) => void
+): Promise<GenResult> {
   const fd = new FormData();
   fd.append("file", file);
   fd.append("pages", pages);
-  const r = await fetch("/api/generate", { method: "POST", body: fd });
-  return r.json();
+  const start = await (await fetch("/api/generate", { method: "POST", body: fd })).json();
+  if (start.error) return start as GenResult;
+  const job = start.job as string;
+  while (true) {
+    await new Promise((r) => setTimeout(r, 2000));
+    const r = await fetch(`/api/generate/status/${job}`, { cache: "no-store" });
+    const st = (await r.json().catch(() => ({}))) as GenResult & {
+      status?: string;
+      done?: number;
+      total?: number;
+    };
+    if (!r.ok && st.status !== "error") {
+      return { error: st.error || `statut ${r.status}` };
+    }
+    onProgress?.(st.done ?? 0, st.total ?? 0);
+    if (st.status === "done" || st.status === "error") return st;
+  }
 }
 
 export async function importCards(

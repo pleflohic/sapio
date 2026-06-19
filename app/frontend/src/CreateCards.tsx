@@ -21,13 +21,17 @@ export function CreateCards({ onDone }: { onDone: () => void }) {
   const [annee, setAnnee] = useState("");
   const [cours, setCours] = useState("");
   const [done, setDone] = useState<{ added?: number; skipped?: number; seeded?: number }>({});
+  const [prog, setProg] = useState<{ done: number; total: number } | null>(null);
   const [err, setErr] = useState("");
 
   async function runGenerate() {
     if (!file) return;
     setPhase("loading");
     setErr("");
-    const d = await generate(file, pages.trim() || "all");
+    setProg(null);
+    const d = await generate(file, pages.trim() || "all", (done, total) =>
+      setProg({ done, total })
+    );
     if (d.error) {
       setErr(d.error);
       setPhase("form");
@@ -60,8 +64,14 @@ export function CreateCards({ onDone }: { onDone: () => void }) {
       <div className="center">
         <h2>Lecture du poly…</h2>
         <p className="lead">
-          Le modèle lit les pages et en extrait la structure. Ça peut prendre une minute.
+          Le modèle lit les pages et en extrait la structure. Ça peut prendre
+          quelques minutes sur un gros poly.
         </p>
+        {prog && prog.total > 0 && (
+          <p className="lead">
+            Lot {Math.min(prog.done + 1, prog.total)} / {prog.total}
+          </p>
+        )}
       </div>
     );
 
