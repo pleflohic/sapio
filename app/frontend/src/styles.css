@@ -186,14 +186,6 @@ a { color: var(--prop); }
   margin-right: 0.5rem; flex: none;
 }
 .deck-count.zero { background: var(--line-strong); color: var(--muted); }
-.deck-name {
-  flex: 1; color: var(--ink); padding: 0.55rem 0.2rem;
-  font-size: 0.98rem; font-weight: 500;
-}
-.deck-due {
-  background: var(--exo, #c9851f); color: #fff; border-radius: 999px;
-  font-size: 0.72rem; font-weight: 700; padding: 0.12rem 0.5rem; margin-right: 0.4rem; flex: none;
-}
 
 /* Settings */
 .settings { max-width: 34rem; }

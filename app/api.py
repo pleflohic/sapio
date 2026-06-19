@@ -243,6 +243,27 @@ def create_api(config: dict) -> Flask:
         return jsonify({"name": "", "full": "", "due": sum(r["due"] for r in roots),
                         "total": sum(r["total"] for r in roots), "children": roots})
 
+    @app.get("/api/deck/cards")
+    def api_deck_cards():
+        # Toutes les cartes Sapio d'un deck (sous-decks inclus), pour consultation.
+        deck = request.args.get("deck", "").strip()
+        if not deck:
+            return jsonify({"cards": [], "deck": ""})
+        ids = anki.find_cards(f'note:"Sapio Restitution" deck:"{deck}"')
+        cards = []
+        for info in anki.cards_info(ids):
+            f = anki.fields_of(info)
+            typ = f.get("Type", "")
+            cards.append({
+                "type": typ, "color": _TYPE_COLOR.get(typ, ""),
+                "mode": f.get("Mode", ""), "importance": f.get("Importance", ""),
+                "titre": f.get("Titre", ""), "lecon": f.get("Lecon", ""),
+                "consigne": f.get("Consigne", ""), "contexte": f.get("Contexte", ""),
+                "attendu": f.get("Attendu", ""), "deck": info.get("deckName", ""),
+            })
+        cards.sort(key=lambda c: (c["deck"], c["titre"], c["mode"]))
+        return jsonify({"cards": cards, "deck": deck})
+
     @app.get("/api/taxonomy")
     def api_taxonomy():
         return jsonify(_taxonomy(_sapio_leaf_decks()))

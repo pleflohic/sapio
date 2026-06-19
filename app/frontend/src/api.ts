@@ -68,6 +68,24 @@ export async function getDeckTree(): Promise<DeckStatNode> {
   return r.json();
 }
 
+export interface DeckCard {
+  type: string;
+  color: string;
+  mode: string;
+  importance: string;
+  titre: string;
+  lecon: string;
+  consigne: string;
+  contexte: string;
+  attendu: string;
+  deck: string;
+}
+
+export async function getDeckCards(deck: string): Promise<{ cards: DeckCard[]; deck: string }> {
+  const r = await fetch("/api/deck/cards?deck=" + encodeURIComponent(deck));
+  return r.json();
+}
+
 export async function syncNow(direction?: string): Promise<{ status?: string; error?: string }> {
   const r = await fetch("/api/sync", {
     method: "POST",
