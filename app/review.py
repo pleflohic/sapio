@@ -31,10 +31,6 @@ _RUBRIQUES = {
     "preuve": "L'élève doit dégager l'idée directrice PUIS rédiger la preuve avec une rigueur "
     "COMPLÈTE : chaque étape justifiée, toutes les hypothèses utilisées, aucun cercle logique, "
     "aucune étape bâclée. Une étape clé manquante ou fausse → Again.",
-    "exemple": "L'objet proposé satisfait-il réellement la propriété demandée, et est-il bien "
-    "justifié ? Plusieurs réponses correctes sont possibles : juge la validité, pas la conformité.",
-    "contre_exemple": "L'objet proposé est-il un contre-exemple VALIDE (il met bien en défaut la "
-    "propriété) et correctement justifié ?",
     "plan": "Le plan reconstruit est-il complet (toutes les grandes parties), bien ordonné, "
     "équilibré, avec les notions à la bonne place ?",
 }

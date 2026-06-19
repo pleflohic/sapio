@@ -22,8 +22,8 @@ _THEOREME_FACETTES = {
     Importance.technique: ["enoncer", "preuve"],
 }
 _DEFINITION_FACETTES = {
-    Importance.central: ["enoncer", "exemple", "contre_exemple"],
-    Importance.standard: ["enoncer", "exemple"],
+    Importance.central: ["enoncer"],
+    Importance.standard: ["enoncer"],
     Importance.technique: ["enoncer"],
 }
 _EXERCICE_FACETTES = {
@@ -34,15 +34,13 @@ _EXERCICE_FACETTES = {
 
 # Modes qui OPÈRENT sur l'énoncé → on affiche l'énoncé comme contexte.
 # (Pas `enoncer` : l'énoncé y est la réponse. Pas `resoudre` : déjà dans la consigne.)
-_CONTEXT_MODES = {"preuve", "exemple", "contre_exemple"}
+_CONTEXT_MODES = {"preuve"}
 
 # Champ de l'objet servant d'`attendu` pour chaque mode. La carte `preuve`
 # fusionne idée directrice et preuve complète : sa référence reste la preuve.
 _ATTENDU_FIELD = {
     "enoncer": "enonce",
     "preuve": "preuve",
-    "exemple": "exemple",
-    "contre_exemple": "contre_exemple",
     "resoudre": "preuve",  # le corrigé de l'exercice
 }
 
@@ -52,8 +50,6 @@ def _consigne(mode: str, obj: CourseObject) -> str:
     return {
         "enoncer": f"Énonce précisément : {t}.",
         "preuve": f"Dégage d'abord l'idée directrice, puis rédige la preuve complète : {t}.",
-        "exemple": f"Donne et justifie un exemple canonique pour : {t}.",
-        "contre_exemple": f"Donne et justifie un contre-exemple éclairant pour : {t}.",
         "resoudre": f"Résous l'exercice : {t}.\n{obj.enonce}",
     }[mode]
 

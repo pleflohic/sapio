@@ -36,7 +36,8 @@ important à connaître. Pour chacun :
       $\\mathscr G$-mesurable alors $\\mathbb E[X|\\mathscr G]=X$ », cas particuliers, \
       remarques-clés) ;
     * "lemme" : un résultat technique, étape intermédiaire ;
-    * "exercice" : un exercice que l'élève doit savoir résoudre.
+    * "exercice" : un exercice que l'élève doit savoir résoudre, OU un exemple / \
+      contre-exemple présent dans le poly assez riche pour être justifié (voir RÈGLES).
   Respecte l'étiquette du poly quand elle existe (« Théorème », « Proposition »…).
 - titre : le nom usuel (« Théorème de Baire », « Définition d'une martingale »…). \
 À défaut, un titre court et descriptif.
@@ -58,11 +59,16 @@ Utilise les numéros visibles sur la page.
     vois et ajoute « [preuve tronquée] ». Pour un EXERCICE : le corrigé — celui du \
     poly s'il existe, sinon rédige toi-même une solution rigoureuse et complète.
 - idees_cles : les 2-3 idées MOTRICES de la preuve / de la résolution, sinon "".
-- exemple : un exemple canonique pertinent s'il figure dans le poly, sinon "".
-- contre_exemple : un contre-exemple éclairant s'il figure dans le poly, sinon "".
 
 RÈGLES :
 - N'invente rien. N'extrais que ce qui est réellement sur les pages.
+- EXEMPLES et CONTRE-EXEMPLES : ne les rattache pas à une définition. Quand le poly \
+  présente un exemple ou un contre-exemple assez riche pour qu'il y ait quelque chose à \
+  ÉTABLIR (montrer qu'un objet vérifie une notion, ou qu'il la met en défaut), émets-le \
+  comme un objet de type "exercice" : `enonce` = la tâche reformulée en question \
+  (« Montrer que ... est une tribu », « Montrer que ... n'est pas mesurable »), `preuve` \
+  = la justification (celle du poly, sinon rédige-la). S'il est trivial ou purement \
+  illustratif, ignore-le.
 - Les champs non pertinents sont des chaînes vides "", jamais omis.
 - Le contenu mathématique est en LaTeX.
 - Ignore les pages de garde, tables des matières, et le texte de liaison sans contenu.
@@ -75,7 +81,7 @@ de la forme :
 {"objets": [{"type": "definition|theoreme|proposition|lemme|exercice", "titre": "...", \
 "chapitre": "...", "lecon": "...", \
 "source_ref": "...", "importance": "central|standard|technique", "enonce": "...", \
-"preuve": "...", "idees_cles": "...", "exemple": "...", "contre_exemple": "..."}]}
+"preuve": "...", "idees_cles": "..."}]}
 S'il n'y a aucun objet sur les pages, renvoie {"objets": []}.\
 """
 
@@ -217,8 +223,6 @@ _STR_FIELDS = (
     "enonce",
     "preuve",
     "idees_cles",
-    "exemple",
-    "contre_exemple",
 )
 
 

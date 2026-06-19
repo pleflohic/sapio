@@ -28,7 +28,6 @@ STATE: dict = {}  # {cards, images, trans, results}
 # l'énoncé de référence).
 PHASES = [
     ("Énoncés", {"enoncer"}),
-    ("Exemples & contre-exemples", {"exemple", "contre_exemple"}),
     ("Démonstrations", {"preuve"}),
     ("Exercices", {"resoudre"}),
 ]

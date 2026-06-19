@@ -46,8 +46,6 @@ class CourseObject(BaseModel):
     enonce: str
     preuve: str
     idees_cles: str
-    exemple: str
-    contre_exemple: str
 
 
 class PageBatchExtraction(BaseModel):
