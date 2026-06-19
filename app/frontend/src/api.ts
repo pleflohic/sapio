@@ -55,6 +55,19 @@ export async function getDecks(): Promise<DeckNode> {
   return r.json();
 }
 
+export interface DeckStatNode {
+  name: string;
+  full: string;
+  due: number;
+  total: number;
+  children: DeckStatNode[];
+}
+
+export async function getDeckTree(): Promise<DeckStatNode> {
+  const r = await fetch("/api/decks/browse");
+  return r.json();
+}
+
 export async function syncNow(direction?: string): Promise<{ status?: string; error?: string }> {
   const r = await fetch("/api/sync", {
     method: "POST",

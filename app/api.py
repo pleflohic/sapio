@@ -209,6 +209,40 @@ def create_api(config: dict) -> Flask:
                     (nodes["::".join(parts[:i])]["children"] if i > 0 else roots).append(node)
         return jsonify({"name": "", "full": "", "count": sum(r["count"] for r in roots), "children": roots})
 
+    @app.get("/api/decks/browse")
+    def api_decks_browse():
+        # Forêt complète pour la consultation : tous les decks (même sans carte
+        # due), avec total de cartes ET cartes dues du jour. Le total est cumulé
+        # sur le sous-arbre ici ; le « due » l'est déjà côté Anki.
+        names = _all_deck_names(_sapio_leaf_decks())
+        due = anki.deck_stats_map()
+        totals = anki.deck_total_counts()
+
+        def due_cnt(full: str) -> int:
+            st = due.get(full, {})
+            return st.get("new", 0) + st.get("learn", 0) + st.get("review", 0)
+
+        nodes: dict[str, dict] = {}
+        roots: list[dict] = []
+        for n in names:
+            parts = n.split("::")
+            for i in range(len(parts)):
+                full = "::".join(parts[: i + 1])
+                if full not in nodes:
+                    node = {"name": parts[i], "full": full, "due": due_cnt(full),
+                            "total": totals.get(full, 0), "children": []}
+                    nodes[full] = node
+                    (nodes["::".join(parts[:i])]["children"] if i > 0 else roots).append(node)
+
+        def agg(node: dict) -> int:
+            node["total"] += sum(agg(ch) for ch in node["children"])
+            return node["total"]
+
+        for r in roots:
+            agg(r)
+        return jsonify({"name": "", "full": "", "due": sum(r["due"] for r in roots),
+                        "total": sum(r["total"] for r in roots), "children": roots})
+
     @app.get("/api/taxonomy")
     def api_taxonomy():
         return jsonify(_taxonomy(_sapio_leaf_decks()))

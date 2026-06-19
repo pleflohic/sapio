@@ -136,6 +136,21 @@ def deck_stats_map() -> dict:
         return out
 
 
+def deck_total_counts() -> dict:
+    """{nom_complet: nombre total de cartes Sapio dans CE deck (hors sous-decks)}.
+
+    Sert à consulter les decks (toutes les cartes, pas seulement celles dues).
+    L'agrégation sur le sous-arbre est faite côté API.
+    """
+    with _LOCK:
+        col = _col()
+        out: dict = {}
+        for cid in col.find_cards('note:"Sapio Restitution"'):
+            name = col.decks.name(col.get_card(cid).did)
+            out[name] = out.get(name, 0) + 1
+        return out
+
+
 def decks_of(card_ids: list) -> set:
     """Ensemble des noms de decks contenant les cartes données."""
     with _LOCK:

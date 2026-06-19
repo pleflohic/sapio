@@ -4,6 +4,7 @@ import { MathJax } from "better-react-mathjax";
 import { Logo } from "./Logo";
 import { CreateCards } from "./CreateCards";
 import { DeckPicker } from "./DeckPicker";
+import { DeckBrowser } from "./DeckBrowser";
 import { Settings } from "./Settings";
 import {
   getDecks,
@@ -69,7 +70,7 @@ export default function App() {
   const [sent, setSent] = useState(0);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
-  const [view, setView] = useState<"review" | "create" | "settings">("review");
+  const [view, setView] = useState<"review" | "create" | "decks" | "settings">("review");
   const [decks, setDecks] = useState<DeckNode | null>(null);
   const [chosenDeck, setChosenDeck] = useState<string | null>(null);
   const [syncMsg, setSyncMsg] = useState("");
@@ -82,6 +83,14 @@ export default function App() {
         getDecks().then(setDecks).catch(() => setErr("Backend injoignable (lance `sapio serve`)."))
       );
   }, []);
+
+  // Retour à l'accueil (choix des decks à réviser) depuis le logo.
+  function goHome() {
+    setView("review");
+    setChosenDeck(null);
+    setStep("prep");
+    setErr("");
+  }
 
   async function doSync() {
     setSyncMsg("Synchro…");
@@ -125,13 +134,18 @@ export default function App() {
     <>
       <header className="appbar">
         <div className="appbar-inner">
-          <Logo />
+          <button className="logo-btn" onClick={goHome} aria-label="Accueil" title="Accueil">
+            <Logo />
+          </button>
           <nav className="tabs">
             <button className={view === "review" ? "tab on" : "tab"} onClick={() => setView("review")}>
               Réviser
             </button>
             <button className={view === "create" ? "tab on" : "tab"} onClick={() => setView("create")}>
               Créer des cartes
+            </button>
+            <button className={view === "decks" ? "tab on" : "tab"} onClick={() => setView("decks")}>
+              Decks
             </button>
             <button className={view === "settings" ? "tab on" : "tab"} onClick={() => setView("settings")}>
               Paramètres
@@ -151,6 +165,8 @@ export default function App() {
           <Settings />
         ) : view === "create" ? (
           <CreateCards onDone={() => location.assign("/")} />
+        ) : view === "decks" ? (
+          <DeckBrowser />
         ) : (
           <ReviewFlow
             {...{ phases, count, step, trans, results, sent, busy, err, run, setTrans, setResults, setSent, setStep }}

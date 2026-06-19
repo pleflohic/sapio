@@ -42,6 +42,8 @@ body {
   border-bottom: 1px solid var(--line);
 }
 .appbar-inner { max-width: 880px; margin: 0 auto; padding: 0.7rem 1.2rem; display: flex; align-items: center; gap: 0.7rem; }
+.logo-btn { background: transparent; border: 0; padding: 0; cursor: pointer; display: inline-flex; }
+.logo-btn:hover { opacity: 0.75; }
 .logo { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; color: var(--ink); line-height: 1; }
 .logo svg { display: block; }
 .tagline { font-size: 0.64rem; letter-spacing: 0.03em; color: var(--muted); text-align: center; }
@@ -184,6 +186,14 @@ a { color: var(--prop); }
   margin-right: 0.5rem; flex: none;
 }
 .deck-count.zero { background: var(--line-strong); color: var(--muted); }
+.deck-name {
+  flex: 1; color: var(--ink); padding: 0.55rem 0.2rem;
+  font-size: 0.98rem; font-weight: 500;
+}
+.deck-due {
+  background: var(--exo, #c9851f); color: #fff; border-radius: 999px;
+  font-size: 0.72rem; font-weight: 700; padding: 0.12rem 0.5rem; margin-right: 0.4rem; flex: none;
+}
 
 /* Settings */
 .settings { max-width: 34rem; }
