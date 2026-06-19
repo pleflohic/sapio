@@ -5,6 +5,7 @@ import { Logo } from "./Logo";
 import { CreateCards } from "./CreateCards";
 import { DeckPicker } from "./DeckPicker";
 import { DeckBrowser } from "./DeckBrowser";
+import { Bilan } from "./Bilan";
 import { Settings } from "./Settings";
 import {
   getDecks,
@@ -70,7 +71,7 @@ export default function App() {
   const [sent, setSent] = useState(0);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
-  const [view, setView] = useState<"review" | "create" | "decks" | "settings">("review");
+  const [view, setView] = useState<"review" | "create" | "decks" | "bilan" | "settings">("review");
   const [decks, setDecks] = useState<DeckNode | null>(null);
   const [chosenDeck, setChosenDeck] = useState<string | null>(null);
   const [syncMsg, setSyncMsg] = useState("");
@@ -147,6 +148,9 @@ export default function App() {
             <button className={view === "decks" ? "tab on" : "tab"} onClick={() => setView("decks")}>
               Decks
             </button>
+            <button className={view === "bilan" ? "tab on" : "tab"} onClick={() => setView("bilan")}>
+              Bilan
+            </button>
             <button className={view === "settings" ? "tab on" : "tab"} onClick={() => setView("settings")}>
               Paramètres
             </button>
@@ -167,6 +171,8 @@ export default function App() {
           <CreateCards onDone={() => location.assign("/")} />
         ) : view === "decks" ? (
           <DeckBrowser />
+        ) : view === "bilan" ? (
+          <Bilan />
         ) : (
           <ReviewFlow
             {...{ phases, count, step, trans, results, sent, busy, err, run, setTrans, setResults, setSent, setStep }}
@@ -174,6 +180,7 @@ export default function App() {
             chosenDeck={chosenDeck}
             onPick={pickDeck}
             onChangeDeck={() => { setChosenDeck(null); setStep("prep"); }}
+            onBilan={() => setView("bilan")}
           />
         )}
       </main>
@@ -183,7 +190,7 @@ export default function App() {
 
 function ReviewFlow(props: any) {
   const { phases, count, step, trans, results, sent, busy, err, run,
-    setTrans, setResults, setSent, setStep, decks, chosenDeck, onPick, onChangeDeck } = props;
+    setTrans, setResults, setSent, setStep, decks, chosenDeck, onPick, onChangeDeck, onBilan } = props;
   if (!chosenDeck) {
     return (
       <>
@@ -227,7 +234,7 @@ function ReviewFlow(props: any) {
             }
           />
         ) : (
-          <Done sent={sent} />
+          <Done sent={sent} onBilan={onBilan} />
         )}
     </>
   );
@@ -418,12 +425,12 @@ function Results({ results, busy, onCommit }: { results: Result[]; busy: boolean
   );
 }
 
-function Done({ sent }: { sent: number }) {
+function Done({ sent, onBilan }: { sent: number; onBilan?: () => void }) {
   return (
     <div className="center">
       <h2>Session validée ✓</h2>
       <p className="lead">{sent} carte(s) envoyée(s) à Anki, FSRS replanifie.</p>
-      <p><a className="btn" href="/api/bilan.pdf" target="_blank" rel="noreferrer">Voir le bilan PDF</a></p>
+      <p><button className="btn" onClick={() => onBilan?.()}>Voir le bilan</button></p>
       <p><a href="/">↺ Retour aux cartes du jour</a></p>
     </div>
   );

@@ -17,7 +17,7 @@ import uuid
 from collections import Counter
 from pathlib import Path
 
-from flask import Flask, jsonify, request, send_file, send_from_directory
+from flask import Flask, jsonify, request, send_from_directory
 
 from . import anki_backend as anki, bilan, cards as cards_mod, extract, history, pdf, review, settings
 
@@ -378,10 +378,6 @@ def create_api(config: dict) -> Flask:
                 "importance": c.get("importance", ""), "note": note, "ease": ease,
             })
             sent += 1
-        try:
-            bilan.build(history.load(config["history"]), config["bilan_out"])
-        except Exception:
-            pass
         synced = _autosync()
         return jsonify({"sent": sent, "synced": synced})
 
@@ -405,10 +401,9 @@ def create_api(config: dict) -> Flask:
         except Exception:
             return False
 
-    @app.get("/api/bilan.pdf")
+    @app.get("/api/bilan")
     def api_bilan():
-        p = Path(config["bilan_out"])
-        return send_file(p) if p.is_file() else ("", 404)
+        return jsonify(bilan.summary(history.load(config["history"])))
 
     # ---- Paramètres (préférences non sensibles uniquement) ----
     @app.get("/api/settings")

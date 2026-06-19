@@ -56,6 +56,7 @@ body {
 .wrap { max-width: 880px; margin: 0 auto; padding: 1.4rem 1.2rem 7rem; }
 h1 { font-size: 1.5rem; margin: 0.2rem 0 0.4rem; letter-spacing: -0.01em; }
 h2 { font-size: 1.22rem; margin: 0.1rem 0 0.2rem; letter-spacing: -0.01em; }
+h3 { font-size: 1.02rem; margin: 0.2rem 0 0.5rem; letter-spacing: -0.01em; }
 .muted { color: var(--muted); }
 .lead { color: var(--muted); margin: 0 0 1.1rem; }
 
@@ -199,6 +200,20 @@ a { color: var(--prop); }
   margin-right: 0.5rem; flex: none;
 }
 .deck-count.zero { background: var(--line-strong); color: var(--muted); }
+
+/* Bilan */
+.bilan-pill { padding: 0.35rem 0.8rem; border-radius: 999px; font-size: 0.88rem; font-weight: 700; color: #fff; }
+.pill-again { background: var(--again); }
+.pill-hard { background: var(--hard); }
+.pill-good { background: var(--good); }
+.pill-easy { background: var(--easy); }
+.bilan-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+.bilan-table th, .bilan-table td { text-align: left; padding: 0.45rem 0.5rem; border-bottom: 1px solid var(--line); }
+.bilan-table th:not(:first-child), .bilan-table td:not(:first-child) { text-align: center; width: 2.4em; }
+.bilan-table thead th { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+.bilan-table tr:last-child td { border-bottom: 0; }
+.note-again { color: var(--again); font-weight: 700; }
+.note-hard { color: var(--hard); font-weight: 700; }
 
 /* Settings */
 .settings { max-width: 34rem; }

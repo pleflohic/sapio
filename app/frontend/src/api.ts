@@ -86,6 +86,26 @@ export async function getDeckCards(deck: string): Promise<{ cards: DeckCard[]; d
   return r.json();
 }
 
+export interface BilanLecon {
+  lecon: string;
+  again: number;
+  hard: number;
+  good: number;
+  easy: number;
+}
+export interface Bilan {
+  date: string;
+  total: number;
+  overview: { again: number; hard: number; good: number; easy: number };
+  par_lecon: BilanLecon[];
+  fragiles: { titre: string; mode: string; note: string }[];
+}
+
+export async function getBilan(): Promise<Bilan> {
+  const r = await fetch("/api/bilan");
+  return r.json();
+}
+
 export async function syncNow(direction?: string): Promise<{ status?: string; error?: string }> {
   const r = await fetch("/api/sync", {
     method: "POST",

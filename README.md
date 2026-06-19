@@ -52,7 +52,7 @@ de meilleure qualité.
 | **Correction de la réponse** | auto-évaluation | copie lue et notée par l'IA contre la réponse attendue |
 | **Planification** | FSRS | FSRS (inchangé) |
 | **Synchro** | AnkiWeb | AnkiWeb (inchangé) |
-| **Suivi** | statistiques Anki | bilan PDF par leçon |
+| **Suivi** | statistiques Anki | bilan par leçon dans l'app |
 
 L'interface est épurée et adaptée au mobile (une seule photo de la copie suffit).
 SAPIO peut tourner en local sur une machine, ou être hébergé sur un VPS et exposé
@@ -85,7 +85,7 @@ Le package Python s'appelle `app`, et la commande CLI reste `sapio`.
 1. Python 3.10 ou plus.
 2. Node 18 ou plus (pour le build du front).
 3. `pdftoppm` et `pdfinfo` (paquet **poppler-utils**), pour le rendu des pages PDF.
-4. `pdflatex` (**TeX Live**), pour le bilan PDF (facultatif).
+4. `pdflatex` (**TeX Live**), pour le bilan PDF en ligne de commande (facultatif).
 5. Une collection Anki (`collection.anki2`). Sur un serveur neuf, elle peut être
    amorcée par une première synchro descendante depuis AnkiWeb.
 
@@ -155,8 +155,12 @@ dev` dans `app/frontend`.
    éditable). Les erreurs de lecture sont corrigées, puis validées.
 3. **Notation.** Le modèle note les transcriptions validées contre la réponse
    attendue, et renvoie un retour ainsi qu'une note ajustable par carte. La
-   validation envoie à FSRS, journalise la session et régénère le bilan PDF. Les
-   cartes non traitées restent intactes.
+   validation envoie à FSRS et journalise la session. Les cartes non traitées
+   restent intactes.
+
+L'onglet **Bilan** présente, à partir de l'historique, une vue d'ensemble des
+notes, leur ventilation par leçon et la liste des points à retravailler
+(dernière restitution Again ou Hard).
 
 ### Créer des cartes
 

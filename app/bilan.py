@@ -22,6 +22,37 @@ def _esc(s: str) -> str:
     return "".join(_SPECIALS.get(c, c) for c in str(s))
 
 
+def summary(records: list[dict]) -> dict:
+    """Agrège l'historique en données JSON pour la vue bilan de l'app.
+
+    Mêmes informations que le PDF : vue d'ensemble, ventilation par leçon, et
+    points fragiles (dernière restitution Again ou Hard). Purement déterministe.
+    """
+    notes = Counter(r["note"] for r in records)
+    latest: dict = {}
+    for r in records:
+        latest[r["card_id"]] = r
+    fragiles = [
+        {"titre": r.get("titre", ""), "mode": r.get("mode", ""), "note": r["note"]}
+        for r in latest.values()
+        if r["note"] in ("again", "hard")
+    ]
+    par_lecon_c: dict = defaultdict(Counter)
+    for r in records:
+        par_lecon_c[r.get("lecon") or "—"][r["note"]] += 1
+    par_lecon = [
+        {"lecon": lec, **{n: c.get(n, 0) for n in ("again", "hard", "good", "easy")}}
+        for lec, c in sorted(par_lecon_c.items())
+    ]
+    return {
+        "date": date.today().isoformat(),
+        "total": len(records),
+        "overview": {n: notes.get(n, 0) for n in ("again", "hard", "good", "easy")},
+        "par_lecon": par_lecon,
+        "fragiles": fragiles,
+    }
+
+
 def _render_tex(records: list[dict]) -> str:
     total = len(records)
     notes = Counter(r["note"] for r in records)
