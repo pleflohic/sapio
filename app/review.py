@@ -34,7 +34,7 @@ def _cap_easy(note: str) -> str:
 _RUBRIQUES = {
     "enoncer": "Fidélité EXACTE à l'énoncé attendu : toutes les hypothèses, tous les "
     "quantificateurs, rien en trop. Une hypothèse oubliée ou un quantificateur faux est grave.",
-    "preuve": "L'élève doit dégager l'idée directrice PUIS rédiger la preuve avec une rigueur "
+    "preuve": "L'élève doit rédiger la preuve avec une rigueur "
     "COMPLÈTE : chaque étape justifiée, toutes les hypothèses utilisées, aucun cercle logique, "
     "aucune étape bâclée. Une étape clé manquante ou fausse → Again.",
     "plan": "Le plan reconstruit est-il complet (toutes les grandes parties), bien ordonné, "

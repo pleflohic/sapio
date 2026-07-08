@@ -37,7 +37,7 @@ _EXERCICE_FACETTES = {
 _CONTEXT_MODES = {"preuve"}
 
 # Champ de l'objet servant d'`attendu` pour chaque mode. La carte `preuve`
-# fusionne idée directrice et preuve complète : sa référence reste la preuve.
+# demande directement la preuve complète : sa référence est la preuve.
 _ATTENDU_FIELD = {
     "enoncer": "enonce",
     "preuve": "preuve",
@@ -49,7 +49,7 @@ def _consigne(mode: str, obj: CourseObject) -> str:
     t = obj.titre
     return {
         "enoncer": f"Énonce précisément : {t}.",
-        "preuve": f"Dégage d'abord l'idée directrice, puis rédige la preuve complète : {t}.",
+        "preuve": f"Rédige la preuve complète : {t}.",
         "resoudre": f"Résous l'exercice : {t}.\n{obj.enonce}",
     }[mode]
 
