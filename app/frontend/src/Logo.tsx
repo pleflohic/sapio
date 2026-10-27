@@ -1,21 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-/** Logo « ANCRAGE » en pixel art (grille 5×7 par lettre), rendu en blocs SVG.
- *  Net à toute taille, monochrome (couleur héritée via currentColor). */
-const FONT: Record<string, string[]> = {
-  S: ["01111", "10000", "10000", "01110", "00001", "00001", "11110"],
-  A: ["01110", "10001", "10001", "11111", "10001", "10001", "10001"],
-  C: ["01111", "10000", "10000", "10000", "10000", "10000", "01111"],
-  P: ["11110", "10001", "10001", "11110", "10000", "10000", "10000"],
-  R: ["11110", "10001", "10001", "11110", "10100", "10010", "10001"],
-  G: ["01111", "10000", "10000", "10111", "10001", "10001", "01111"],
-  E: ["11111", "10000", "10000", "11110", "10000", "10000", "11111"],
-  I: ["11111", "00100", "00100", "00100", "00100", "00100", "11111"],
-  O: ["01110", "10001", "10001", "10001", "10001", "10001", "01110"],
-};
-const WORD = "ANCRAGE";
-const COLS = 5;
-const ROWS = 7;
-const GAP = 1; // colonne vide entre les lettres
+/** Logo Ancrage : une ancre simple, suivie d'un mot-symbole lisible. */
 
 export function Logo({
   px = 4,
@@ -24,27 +8,38 @@ export function Logo({
   px?: number;
   tagline?: string;
 }) {
-  const rects: JSX.Element[] = [];
-  let xOff = 0;
-  for (const ch of WORD) {
-    const glyph = FONT[ch];
-    for (let r = 0; r < ROWS; r++) {
-      for (let c = 0; c < COLS; c++) {
-        if (glyph[r][c] === "1") {
-          rects.push(
-            <rect key={`${xOff}-${r}-${c}`} x={(xOff + c) * px} y={r * px} width={px} height={px} />
-          );
-        }
-      }
-    }
-    xOff += COLS + GAP;
-  }
-  const w = (xOff - GAP) * px;
-  const h = ROWS * px;
+  const scale = px / 4;
+  const width = 154 * scale;
+  const height = 32 * scale;
   return (
     <span className="logo">
-      <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} fill="currentColor" role="img" aria-label="ANCRAGE" shapeRendering="crispEdges">
-        {rects}
+      <svg
+        width={width}
+        height={height}
+        viewBox="0 0 154 32"
+        fill="none"
+        role="img"
+        aria-label="ANCRAGE"
+      >
+        <circle cx="10" cy="7" r="4" stroke="currentColor" strokeWidth="2" />
+        <path
+          d="M10 11v13M4 17h12M4 17c0 6 2.7 9 6 9s6-3 6-9M6 28h8"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <text
+          x="29"
+          y="18"
+          fill="currentColor"
+          fontFamily="Segoe UI, system-ui, sans-serif"
+          fontSize="15"
+          fontWeight="700"
+          letterSpacing="1.3"
+        >
+          ANCRAGE
+        </text>
       </svg>
       {tagline && <span className="tagline">{tagline}</span>}
     </span>

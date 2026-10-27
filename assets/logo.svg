@@ -1,5 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="460" height="210" viewBox="0 0 460 210" role="img" aria-label="ANCRAGE">
   <rect x="1" y="1" width="458" height="208" rx="22" fill="#fbfbf9" stroke="#e0e0da" stroke-width="2"/>
-  <text x="230" y="112" text-anchor="middle" font-family="Segoe UI, system-ui, sans-serif" font-size="68" font-weight="700" letter-spacing="6" fill="#1b1b1f">ANCRAGE</text>
-  <text x="230" y="166" text-anchor="middle" dominant-baseline="hanging" font-family="Segoe UI, system-ui, sans-serif" font-size="15" letter-spacing="1.2" fill="#6f6f78">Comprendre, prouver, retenir</text>
+  <g fill="none" stroke="#1b1b1f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="92" cy="64" r="14"/>
+    <path d="M92 78v60M70 106h44M70 106c0 27 10 39 22 39s22-12 22-39M78 154h28"/>
+  </g>
+  <text x="132" y="117" font-family="Segoe UI, system-ui, sans-serif" font-size="61" font-weight="700" letter-spacing="3" fill="#1b1b1f">ANCRAGE</text>
+  <text x="230" y="166" text-anchor="middle" dominant-baseline="hanging" font-family="Segoe UI, system-ui, sans-serif" font-size="15" letter-spacing="1.2" fill="#6f6f78">Bridge the power of Anki and AI</text>
 </svg>
