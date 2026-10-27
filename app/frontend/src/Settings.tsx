@@ -51,7 +51,7 @@ export function Settings() {
   return (
     <div className="settings">
       <h2>Paramètres</h2>
-      <p className="lead">Préférences appliquées immédiatement, stockées dans <code>~/.config/sapio/settings.json</code>.</p>
+      <p className="lead">Préférences appliquées immédiatement, stockées dans <code>~/.config/ancrage/settings.json</code>.</p>
 
       <label className="field">
         <span>Fournisseur</span>

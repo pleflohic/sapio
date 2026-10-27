@@ -6,7 +6,7 @@ Option « stricte » : ce module ne gère QUE des réglages non sensibles
 identifiants AnkiWeb) ne passent jamais par ici ni par HTTP : ils restent dans
 l'environnement / le `.env`. On expose seulement leur *présence* (✓/✗).
 
-Fichier : $SAPIO_CONFIG_DIR (ou ~/.config/sapio)/settings.json, créé à la
+Fichier : $ANCRAGE_CONFIG_DIR (ou ~/.config/ancrage)/settings.json, créé à la
 première sauvegarde (chmod 600). Amorcé depuis l'environnement → rétro-compat
 avec un `.env` existant.
 """
@@ -26,10 +26,10 @@ _PREF_KEYS = ("provider", "extract_model", "review_model", "dpi", "collection")
 
 
 def _config_dir() -> Path:
-    base = os.environ.get("SAPIO_CONFIG_DIR")
+    base = os.environ.get("ANCRAGE_CONFIG_DIR")
     if base:
         return Path(base)
-    return Path(os.environ.get("XDG_CONFIG_HOME") or (Path.home() / ".config")) / "sapio"
+    return Path(os.environ.get("XDG_CONFIG_HOME") or (Path.home() / ".config")) / "ancrage"
 
 
 def _path() -> Path:
@@ -38,15 +38,19 @@ def _path() -> Path:
 
 def _defaults() -> dict:
     return {
-        "provider": os.environ.get("SAPIO_PROVIDER", "anthropic"),
-        "extract_model": os.environ.get("SAPIO_EXTRACT_MODEL")
+        "provider": os.environ.get("ANCRAGE_PROVIDER") or os.environ.get("SAPIO_PROVIDER", "anthropic"),
+        "extract_model": os.environ.get("ANCRAGE_EXTRACT_MODEL")
+        or os.environ.get("ANCRAGE_MODEL")
+        or os.environ.get("SAPIO_EXTRACT_MODEL")
         or os.environ.get("SAPIO_MODEL")
         or "claude-sonnet-4-6",
-        "review_model": os.environ.get("SAPIO_REVIEW_MODEL")
+        "review_model": os.environ.get("ANCRAGE_REVIEW_MODEL")
+        or os.environ.get("ANCRAGE_MODEL")
+        or os.environ.get("SAPIO_REVIEW_MODEL")
         or os.environ.get("SAPIO_MODEL")
         or "claude-opus-4-8",
-        "dpi": int(os.environ.get("SAPIO_DPI", 150)),
-        "collection": os.environ.get("SAPIO_COLLECTION", ""),
+        "dpi": int(os.environ.get("ANCRAGE_DPI") or os.environ.get("SAPIO_DPI", 150)),
+        "collection": os.environ.get("ANCRAGE_COLLECTION") or os.environ.get("SAPIO_COLLECTION", ""),
     }
 
 

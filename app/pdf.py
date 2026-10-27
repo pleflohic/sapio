@@ -3,7 +3,7 @@
 
 Le corps mathématique d'un poly LaTeX ne s'extrait pas proprement en texte
 (pdftotext ne rend que la table des matières) ; on lit donc les pages en
-vision. Voir spec_sapio.md §5.
+vision. Voir spec_ancrage.md §5.
 """
 
 from __future__ import annotations

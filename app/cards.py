@@ -3,7 +3,7 @@
 
 La politique de graduation (quelles facettes produire selon l'importance) vit
 ici, dans du code transparent et réglable, plutôt que dans le modèle. Voir
-spec_sapio.md §4. Une carte n'est émise que si son contenu de référence
+spec_ancrage.md §4. Une carte n'est émise que si son contenu de référence
 (`attendu`) existe réellement dans l'objet.
 """
 

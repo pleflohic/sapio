@@ -1,13 +1,13 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Accès à Anki via la librairie Python `anki` (collection ouverte en direct).
 
-Pas d'interface graphique, pas d'AnkiConnect : Sapio ouvre le fichier de
+Pas d'interface graphique, pas d'AnkiConnect : Ancrage ouvre le fichier de
 collection `.anki2`, planifie avec FSRS et synchronise avec AnkiWeb. Voir
-spec_sapio.md §2. Une seule collection ouverte à la fois (verrou de fichier) :
+spec_ancrage.md §2. Une seule collection ouverte à la fois (verrou de fichier) :
 ne pas lancer Anki desktop sur la même collection en parallèle.
 
 L'interface (find_cards, cards_info, answer_card, ensure_model, card_to_note…)
-est conservée pour que le reste de Sapio ne change pas.
+est conservée pour que le reste d'Ancrage ne change pas.
 """
 
 from __future__ import annotations
@@ -16,7 +16,13 @@ import os
 import re
 import threading
 
-MODEL_NAME = "Sapio Restitution"
+MODEL_NAME = "Ancrage Restitution"
+LEGACY_MODEL_NAME = "Sapio Restitution"
+
+
+def model_query() -> str:
+    """Requête les cartes Ancrage et les cartes historiques Sapio."""
+    return f'(note:"{MODEL_NAME}" OR note:"{LEGACY_MODEL_NAME}")'
 FIELDS = ["Consigne", "Attendu", "Type", "Mode", "Importance", "Titre", "Chapitre", "Lecon", "SourceRef", "Contexte"]
 
 TYPE_LABEL = {
@@ -73,7 +79,7 @@ def _col():
     global _COL
     if _COL is None:
         if not _COL_PATH:
-            raise AnkiError("Collection non configurée (définis SAPIO_COLLECTION).")
+            raise AnkiError("Collection non configurée (définis ANCRAGE_COLLECTION).")
         from anki.collection import Collection
 
         _COL = Collection(_COL_PATH)
@@ -137,7 +143,7 @@ def deck_stats_map() -> dict:
 
 
 def deck_total_counts() -> dict:
-    """{nom_complet: nombre total de cartes Sapio dans CE deck (hors sous-decks)}.
+    """{nom_complet: nombre total de cartes Ancrage dans CE deck (hors sous-decks).
 
     Sert à consulter les decks (toutes les cartes, pas seulement celles dues).
     L'agrégation sur le sous-arbre est faite côté API.
@@ -145,7 +151,7 @@ def deck_total_counts() -> dict:
     with _LOCK:
         col = _col()
         out: dict = {}
-        for cid in col.find_cards('note:"Sapio Restitution"'):
+        for cid in col.find_cards(model_query()):
             name = col.decks.name(col.get_card(cid).did)
             out[name] = out.get(name, 0) + 1
         return out
@@ -271,20 +277,20 @@ def ensure_model() -> None:
 
 
 # --- Preset de deck (étapes d'apprentissage adaptées FSRS) ------------------
-_SAPIO_PRESET = "SAPIO"
+_ANCRAGE_PRESET = "ANCRAGE"
 
 
-def _ensure_sapio_preset(col) -> int:
-    """Garantit un preset de deck « SAPIO » sans étapes d'apprentissage.
+def _ensure_ancrage_preset(col) -> int:
+    """Garantit un preset de deck « ANCRAGE » sans étapes d'apprentissage.
 
     Sans paliers (new/lapse delays vides), un « bon » fait passer la carte
     directement à son intervalle FSRS au lieu de la faire repasser dans la
-    session. C'est adapté au modèle de SAPIO (une copie écrite et photographiée
+    session. C'est adapté au modèle d'Ancrage (une copie écrite et photographiée
     en une fois, pas de reprise quelques minutes après). Renvoie l'id du preset.
     """
-    conf = next((c for c in col.decks.all_config() if c["name"] == _SAPIO_PRESET), None)
+    conf = next((c for c in col.decks.all_config() if c["name"] == _ANCRAGE_PRESET), None)
     if conf is None:
-        cid = col.decks.add_config_returning_id(_SAPIO_PRESET)
+        cid = col.decks.add_config_returning_id(_ANCRAGE_PRESET)
         conf = col.decks.get_config(cid)
     changed = False
     if conf["new"].get("delays") != []:
@@ -299,13 +305,13 @@ def _ensure_sapio_preset(col) -> int:
 
 
 def _apply_preset_locked(col) -> int:
-    """Assigne le preset SAPIO à tous les decks contenant des cartes Sapio.
+    """Assigne le preset Ancrage à tous les decks contenant des cartes Ancrage.
 
     Idempotent : un deck déjà sur le preset n'est pas réécrit (pas de churn de
     synchro). Renvoie le nombre de decks effectivement réassignés.
     """
-    cid = _ensure_sapio_preset(col)
-    names = {col.decks.name(col.get_card(c).did) for c in col.find_cards('note:"Sapio Restitution"')}
+    cid = _ensure_ancrage_preset(col)
+    names = {col.decks.name(col.get_card(c).did) for c in col.find_cards(model_query())}
     n = 0
     for name in names:
         did = col.decks.id(name, create=False)
@@ -343,7 +349,7 @@ def add_notes(notes: list) -> list:
                 res.append(note.id)
             except Exception:
                 res.append(None)
-        _apply_preset_locked(col)  # SAPIO impose ses étapes d'apprentissage
+        _apply_preset_locked(col)  # Ancrage impose ses étapes d'apprentissage
         return res
 
 
@@ -432,7 +438,7 @@ def card_to_note(card: dict, deck_root: str, lookup: dict | None = None) -> dict
             "SourceRef": card.get("source_ref", ""),
             "Contexte": latex_for_anki(card.get("contexte", "")),
         },
-        "tags": ["sapio", f"mode::{card['mode']}", f"importance::{card['importance']}"],
+        "tags": ["ancrage", f"mode::{card['mode']}", f"importance::{card['importance']}"],
     }
 
 

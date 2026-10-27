@@ -81,7 +81,7 @@ export default function App() {
     syncNow()
       .catch(() => {})
       .finally(() =>
-        getDecks().then(setDecks).catch(() => setErr("Backend injoignable (lance `sapio serve`)."))
+        getDecks().then(setDecks).catch(() => setErr("Backend injoignable (lance `ancrage serve`)."))
       );
   }, []);
 

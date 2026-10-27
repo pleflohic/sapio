@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """Boucle de révision — lecture et notation d'une copie manuscrite.
 
-Cœur « runtime » de Sapio (spec_sapio.md §6). Deux usages :
+Cœur « runtime » d'Ancrage (spec_ancrage.md §6). Deux usages :
 
 - CLI `review` (une carte / une photo) : `evaluate()` lit + note en un coup.
 - App web (session du jour, une seule capture) : flux en 3 temps —

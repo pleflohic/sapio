@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-"""Bilan de performance cumulatif (spec_sapio.md §8).
+"""Bilan de performance cumulatif (spec_ancrage.md §8).
 
 Lit l'historique des révisions et produit un fichier LaTeX compilé en PDF :
 vue d'ensemble, performance par leçon et par mode, points à retravailler.
-Généré automatiquement en fin de session (et à la demande via `sapio bilan`).
+Généré automatiquement en fin de session (et à la demande via `ancrage bilan`).
 """
 
 from __future__ import annotations
@@ -87,7 +87,7 @@ def _render_tex(records: list[dict]) -> str:
 \setlength{{\parindent}}{{0pt}}
 \begin{{document}}
 
-{{\Large\bfseries Bilan de révision --- Sapio}}\\[2pt]
+{{\Large\bfseries Bilan de révision --- Ancrage}}\\[2pt]
 {date.today().isoformat()} \quad\textbullet\quad {total} restitution(s) évaluée(s)
 
 \bigskip

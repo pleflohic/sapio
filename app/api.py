@@ -45,7 +45,7 @@ _TYPE_COLOR = {
 DIST = Path(__file__).resolve().parent / "frontend" / "dist"
 
 # Taille de lot par défaut pour la génération web (pages par appel au LLM).
-# Surchargeable par SAPIO_BATCH_PAGES. Évite de dépasser le budget de sortie.
+# Surchargeable par ANCRAGE_BATCH_PAGES. Évite de dépasser le budget de sortie.
 _GEN_BATCH_PAGES = 10
 
 # Niveau de maîtrise initial par sous-deck → intervalle FSRS (jours). « neuf »
@@ -63,9 +63,9 @@ def _parse_pages(spec: str, total: int) -> tuple[int, int]:
     return max(1, n), min(total, n)
 
 
-def _sapio_leaf_decks() -> set:
-    """Decks (feuilles) contenant des cartes Sapio, identifiées par le note type."""
-    ids = anki.find_cards('note:"Sapio Restitution"')
+def _ancrage_leaf_decks() -> set:
+    """Decks contenant des cartes Ancrage, y compris les cartes historiques."""
+    ids = anki.find_cards(anki.model_query())
     return anki.decks_of(ids) if ids else set()
 
 
@@ -165,7 +165,7 @@ def _run_generation(job_id: str, tmp_path: str, spec: str, s: dict, batch: int, 
             "objects": len(objs), "cards": len(cards),
             "by_type": dict(Counter(o.type.value for o in objs)),
             "pages": [first, last, total], "decks": decks,
-            "suggestion": suggestion, "taxonomy": _taxonomy(_sapio_leaf_decks()),
+            "suggestion": suggestion, "taxonomy": _taxonomy(_ancrage_leaf_decks()),
             "failed": failed,
         }
         with _JOBS_LOCK:
@@ -188,9 +188,9 @@ def create_api(config: dict) -> Flask:
     # ---- API ----
     @app.get("/api/decks")
     def api_decks():
-        # Forêt des decks Sapio (Année › Cours › Chapitre › Partie), sans racine
+        # Forêt des decks Ancrage (Année › Cours › Chapitre › Partie), sans racine
         # artificielle. Compteurs plafonnés (limites quotidiennes d'Anki).
-        names = _all_deck_names(_sapio_leaf_decks())
+        names = _all_deck_names(_ancrage_leaf_decks())
         stats = anki.deck_stats_map()
 
         def cnt(full: str) -> int:
@@ -214,7 +214,7 @@ def create_api(config: dict) -> Flask:
         # Forêt complète pour la consultation : tous les decks (même sans carte
         # due), avec total de cartes ET cartes dues du jour. Le total est cumulé
         # sur le sous-arbre ici ; le « due » l'est déjà côté Anki.
-        names = _all_deck_names(_sapio_leaf_decks())
+        names = _all_deck_names(_ancrage_leaf_decks())
         due = anki.deck_stats_map()
         totals = anki.deck_total_counts()
 
@@ -245,11 +245,11 @@ def create_api(config: dict) -> Flask:
 
     @app.get("/api/deck/cards")
     def api_deck_cards():
-        # Toutes les cartes Sapio d'un deck (sous-decks inclus), pour consultation.
+        # Toutes les cartes Ancrage d'un deck (sous-decks inclus), pour consultation.
         deck = request.args.get("deck", "").strip()
         if not deck:
             return jsonify({"cards": [], "deck": ""})
-        ids = anki.find_cards(f'note:"Sapio Restitution" deck:"{deck}"')
+        ids = anki.find_cards(f'{anki.model_query()} deck:"{deck}"')
         cards = []
         for info in anki.cards_info(ids):
             f = anki.fields_of(info)
@@ -266,7 +266,7 @@ def create_api(config: dict) -> Flask:
 
     @app.get("/api/taxonomy")
     def api_taxonomy():
-        return jsonify(_taxonomy(_sapio_leaf_decks()))
+        return jsonify(_taxonomy(_ancrage_leaf_decks()))
 
     @app.get("/api/cards")
     def api_cards():
@@ -389,7 +389,7 @@ def create_api(config: dict) -> Flask:
         except anki.AnkiError as e:
             return jsonify({"error": str(e)})
         try:
-            anki.apply_deck_preset()  # réimpose les étapes d'apprentissage SAPIO
+            anki.apply_deck_preset()  # réimpose les étapes d'apprentissage Ancrage
         except Exception:
             pass
         return jsonify({"status": status})
@@ -435,7 +435,7 @@ def create_api(config: dict) -> Flask:
         dpi = s.get("dpi", 150)
         # Découpage automatique en lots de pages : un gros poly dépasse le budget
         # de sortie d'un seul appel. On traite par tranches et on accumule.
-        batch = int(os.environ.get("SAPIO_BATCH_PAGES", 0) or 0) or _GEN_BATCH_PAGES
+        batch = int(os.environ.get("ANCRAGE_BATCH_PAGES") or os.environ.get("SAPIO_BATCH_PAGES", 0)) or _GEN_BATCH_PAGES
         tmp = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
         try:
             f.save(tmp.name)
@@ -491,7 +491,7 @@ def create_api(config: dict) -> Flask:
         decks = body.get("decks", gen["decks"])
         annee = (body.get("annee") or "").strip()
         cours = (body.get("cours") or "").strip()
-        deck_root = "::".join(p for p in (annee, cours) if p) or "Sapio"
+        deck_root = "::".join(p for p in (annee, cours) if p) or "Ancrage"
         lookup = cards_mod.deck_lookup(decks)
         notes = [anki.card_to_note(c, deck_root, lookup) for c in gen["cards"]]
         deck_names = sorted({n["deckName"] for n in notes})
@@ -538,7 +538,7 @@ def create_api(config: dict) -> Flask:
             return send_from_directory(DIST, "index.html")
         return (
             "<h1>Front non construit</h1><p>Lance <code>npm run build</code> dans "
-            "<code>sapio/frontend</code>, ou <code>npm run dev</code> pour le mode dev.</p>",
+            "<code>ancrage/frontend</code>, ou <code>npm run dev</code> pour le mode dev.</p>",
             200,
         )
 

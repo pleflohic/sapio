@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
-"""Application web locale de révision (spec_sapio.md §6).
+"""Application web locale de révision (spec_ancrage.md §6).
 
 Flux en 3 temps (« une seule capture ») :
 1. Cartes du jour numérotées → l'élève travaille tout sur papier (avec les numéros)

@@ -4,7 +4,7 @@
     gunicorn app.wsgi:app --bind 127.0.0.1:5000
 
 Les secrets sont lus dans l'environnement / `.env` ; les préférences
-(provider, modèles, DPI, collection) dans ~/.config/sapio/settings.json,
+(provider, modèles, DPI, collection) dans ~/.config/ancrage/settings.json,
 éditables depuis l'onglet Paramètres. Voir le README.
 
 ⚠️  Aucune authentification intégrée : ne jamais exposer publiquement sans
@@ -23,9 +23,9 @@ _load_dotenv()  # amorce l'environnement depuis .env si présent
 # Réglages opérationnels (les prefs viennent de settings.json via create_api).
 app = create_api(
     {
-        "query": os.environ.get("SAPIO_QUERY", "deck:*::* is:due"),
-        "limit": int(os.environ.get("SAPIO_LIMIT", 20)),
-        "history": os.environ.get("SAPIO_HISTORY", "history.json"),
-        "bilan_out": os.environ.get("SAPIO_BILAN", "bilan.pdf"),
+        "query": os.environ.get("ANCRAGE_QUERY") or os.environ.get("SAPIO_QUERY", "deck:*::* is:due"),
+        "limit": int(os.environ.get("ANCRAGE_LIMIT") or os.environ.get("SAPIO_LIMIT", 20)),
+        "history": os.environ.get("ANCRAGE_HISTORY") or os.environ.get("SAPIO_HISTORY", "history.json"),
+        "bilan_out": os.environ.get("ANCRAGE_BILAN") or os.environ.get("SAPIO_BILAN", "bilan.pdf"),
     }
 )

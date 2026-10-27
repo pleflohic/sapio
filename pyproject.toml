@@ -1,5 +1,5 @@
 [project]
-name = "sapio"
+name = "ancrage"
 version = "0.0.1"
 description = "Révision active par IA branchée sur Anki : génère des cartes de restitution depuis un poly PDF, corrige tes copies manuscrites et planifie via FSRS."
 readme = "README.md"
@@ -16,7 +16,7 @@ dependencies = [
 prod = ["gunicorn>=21.0"]
 
 [project.scripts]
-sapio = "app.cli:main"
+ancrage = "app.cli:main"
 
 [build-system]
 requires = ["setuptools>=61"]

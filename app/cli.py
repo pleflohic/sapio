@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """CLI du prototype de génération.
 
-    sapio extract <poly.pdf> [options]
+    ancrage extract <poly.pdf> [options]
 
 Pipeline : pages PDF → vision (objets de cours) → expansion graduée (cartes).
 Produit deux fichiers JSON : les objets (relisibles/ajustables) et les cartes.
@@ -326,7 +326,7 @@ def cmd_serve(args: argparse.Namespace) -> int:
     }
     app = api.create_api(config)
     s = settings.get()
-    print(f"Sapio web → http://{args.host}:{args.port}  "
+    print(f"Ancrage web → http://{args.host}:{args.port}  "
           f"(provider {s['provider']} — extraction {s['extract_model']} / notation {s['review_model']})")
     print(f"Depuis ton téléphone (même réseau) : http://<IP-de-cet-ordi>:{args.port}")
     app.run(host=args.host, port=args.port)
@@ -335,15 +335,15 @@ def cmd_serve(args: argparse.Namespace) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     # Défauts résolus depuis l'environnement (chargé par _load_dotenv avant ici).
-    provider = os.environ.get("SAPIO_PROVIDER", DEFAULT_PROVIDER)
+    provider = os.environ.get("ANCRAGE_PROVIDER") or os.environ.get("SAPIO_PROVIDER", DEFAULT_PROVIDER)
     # Modèle par étape : un modèle économique pour l'extraction, un modèle
-    # de pointe pour la notation. Repli : SAPIO_MODEL puis défaut du provider.
-    extract_model = os.environ.get("SAPIO_EXTRACT_MODEL") or os.environ.get("SAPIO_MODEL")
-    review_model = os.environ.get("SAPIO_REVIEW_MODEL") or os.environ.get("SAPIO_MODEL")
-    dpi = int(os.environ.get("SAPIO_DPI", DEFAULT_DPI))
-    batch = int(os.environ.get("SAPIO_BATCH_PAGES", DEFAULT_BATCH_PAGES))
+    # de pointe pour la notation. Repli : ANCRAGE_MODEL puis défaut du provider.
+    extract_model = os.environ.get("ANCRAGE_EXTRACT_MODEL") or os.environ.get("ANCRAGE_MODEL") or os.environ.get("SAPIO_EXTRACT_MODEL") or os.environ.get("SAPIO_MODEL")
+    review_model = os.environ.get("ANCRAGE_REVIEW_MODEL") or os.environ.get("ANCRAGE_MODEL") or os.environ.get("SAPIO_REVIEW_MODEL") or os.environ.get("SAPIO_MODEL")
+    dpi = int(os.environ.get("ANCRAGE_DPI") or os.environ.get("SAPIO_DPI", DEFAULT_DPI))
+    batch = int(os.environ.get("ANCRAGE_BATCH_PAGES") or os.environ.get("SAPIO_BATCH_PAGES", DEFAULT_BATCH_PAGES))
 
-    p = argparse.ArgumentParser(prog="sapio", description=__doc__)
+    p = argparse.ArgumentParser(prog="ancrage", description=__doc__)
     sub = p.add_subparsers(dest="command", required=True)
 
     e = sub.add_parser("extract", help="Génère des cartes à partir d'un poly PDF.")
@@ -357,7 +357,7 @@ def build_parser() -> argparse.ArgumentParser:
     e.add_argument(
         "--model",
         default=extract_model,
-        help="Modèle d'extraction (défaut : SAPIO_EXTRACT_MODEL).",
+        help="Modèle d'extraction (défaut : ANCRAGE_EXTRACT_MODEL).",
     )
     e.add_argument("--pages", default="all", help='Pages : "all", "5" ou "3-12".')
     e.add_argument(
@@ -385,7 +385,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--decks", default="decks.json",
         help="Mapping de decks édité (défaut decks.json ; ignoré s'il manque).",
     )
-    pu.add_argument("--deck", default="Sapio", help="Deck racine (défaut Sapio).")
+    pu.add_argument("--deck", default="Ancrage", help="Deck racine (défaut Ancrage).")
     pu.add_argument(
         "--url", default="http://localhost:8765", help="URL AnkiConnect (défaut localhost:8765)."
     )
@@ -402,10 +402,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--provider", default=provider, choices=["openrouter", "anthropic"],
         help=f"Fournisseur (défaut {provider}).",
     )
-    r.add_argument("--model", default=review_model, help="Modèle de notation (défaut : SAPIO_REVIEW_MODEL).")
+    r.add_argument("--model", default=review_model, help="Modèle de notation (défaut : ANCRAGE_REVIEW_MODEL).")
     r.add_argument(
-        "--query", default="deck:Sapio* is:due",
-        help="Requête Anki des cartes à réviser (défaut 'deck:Sapio* is:due').",
+        "--query", default="(deck:Ancrage* OR deck:Sapio*) is:due",
+        help="Requête Anki des cartes à réviser (défaut Ancrage et anciens decks Sapio).",
     )
     r.add_argument("--limit", type=int, default=20, help="Nb max de cartes (défaut 20).")
     r.add_argument("--url", default="http://localhost:8765", help="URL AnkiConnect.")
@@ -423,10 +423,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--provider", default=provider, choices=["openrouter", "anthropic"],
         help=f"Fournisseur (défaut {provider}).",
     )
-    s.add_argument("--model", default=review_model, help="Modèle de notation (défaut : SAPIO_REVIEW_MODEL).")
+    s.add_argument("--model", default=review_model, help="Modèle de notation (défaut : ANCRAGE_REVIEW_MODEL).")
     s.add_argument("--host", default="0.0.0.0", help="Hôte d'écoute (défaut 0.0.0.0).")
     s.add_argument("--port", type=int, default=5000, help="Port (défaut 5000).")
-    s.add_argument("--query", default="deck:Sapio* is:due", help="Requête Anki des cartes.")
+    s.add_argument("--query", default="(deck:Ancrage* OR deck:Sapio*) is:due", help="Requête Anki des cartes Ancrage.")
     s.add_argument("--limit", type=int, default=20, help="Nb max de cartes (défaut 20).")
     s.add_argument("--url", default="http://localhost:8765", help="URL AnkiConnect.")
     s.add_argument("--history", default="history.json", help="Fichier d'historique.")

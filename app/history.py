@@ -2,7 +2,7 @@
 """Historique cumulatif des révisions.
 
 Stocké localement en JSON (history.json par défaut). Sert de mémoire des
-restitutions passées et alimente le bilan PDF (spec_sapio.md §8).
+restitutions passées et alimente le bilan PDF (spec_ancrage.md §8).
 
 Note d'archi : la spec prévoit à terme de persister cet historique dans le
 champ `custom_data` de la carte Anki ; AnkiConnect ne l'expose pas proprement,
